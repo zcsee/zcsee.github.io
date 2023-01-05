@@ -30,7 +30,7 @@ twitter_username: gg
 github_username:  zcsee
 
 # Build settings
-theme: hacker
+theme: Midnight
 plugins:
   - jekyll-feed
 
