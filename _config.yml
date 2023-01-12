@@ -21,7 +21,7 @@ nav:
 
 # Footer
 footer:
-  since: 2017
+  since: 2023
 
 # Author 配置博主信息
 author: '施志成'
@@ -51,7 +51,7 @@ social-share-items: ['wechat', 'weibo', 'douban']
 theme-color: 'default'  # pink or default
 
 # Post header background patterns (when the post no cover): circuitBoard, overlappingCircles, food, glamorous, ticTacToe, seaOfClouds
-postPatterns: 'circuitBoard'
+postPatterns: 'overlappingCircles'
 
 # SNS settings 配置社交网站
 # url: email, weibo, zhihu, twitter, instagram, juejin, github, douban, facebook, dribble, uicn, jianshu, medium, linkedin
