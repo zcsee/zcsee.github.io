@@ -4,6 +4,7 @@ description: '昵称悟空，千禧一代，前端开发者/伪极客/灵魂摄�
 keyword: '廖柯宇, 廖柯宇的独立博客, 廖柯宇的博客, 前端, 前端开发, 前端博客, javascript, vuejs, nodejs, 设计'
 url: '' # your host
 
+<<<<<<< HEAD
 # when build blog on server, if you don't need baseurl, you should leave this value blank.
 # 在服务器上建站时，如果你不需要子域名，请将这一格留空
 # if you're using GitHub Pages, set baseurl to your blog's .
@@ -69,6 +70,21 @@ recommend-condition-size: 12 # a tag will be recommended if the size of it is mo
 paginate: 6
 paginate_path: 'page:num'
 exclude: ['node_modules', 'dev', 'package.json', 'gulpfile.js', '.gitignore', 'README.md']
+=======
+title: Jason's Blog
+email: szcheng0@126.com
+description: >- # this means to ignore newlines until "baseurl:"
+  GG Winni
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "http://zcsee.github.io" # the base hostname & protocol for your site, e.g. http://example.com
+# twitter_username: gg
+# github_username:  zcsee
+
+# Build settings
+theme: minima
+plugins:
+  - jekyll-feed
+>>>>>>> 1cfa0f0701cf590812eb0915f0c05337ed55a6db
 
 # Markdown
 markdown: kramdown
