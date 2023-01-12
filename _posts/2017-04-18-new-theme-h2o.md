@@ -5,7 +5,7 @@ subtitle: '或许是最漂亮的Jekyll主题'
 date: 2017-04-18
 categories: 技术
 author: Jason
-cover: 'assets/img/pfofile.png'
+cover: 'assets/img/profile.png'
 tags: jekyll 前端开发 设计
 ---
 
