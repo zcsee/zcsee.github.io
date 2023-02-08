@@ -23,7 +23,8 @@ tags: centos7 密码重置
 
 1. 机器重启后，在如下画面按e，进行编辑（这个界面只会停留几秒，如果错过请重启机器）
 
-   ![image-20230208103109282](../assets/images/20230208/image-20230208103109282.png)
+   ![image-20230208103109282][core_screen]
+   ![选择内核界面][core_screen]
 
    > 会进入如下图所示的修改界面
 
@@ -58,3 +59,5 @@ tags: centos7 密码重置
 6. 经过正常的系统重启过程，来到正常登录界面，输入root和新修改的密码，正常登录
 
    ![image-20230208115106457](../assets/images/20230208/image-20230208115106457.png)
+
+[core_screen]: https://github.com/zcsee/zcsee.github.io/blob/main/assets/images/20230208/image-20230208103109282.png
