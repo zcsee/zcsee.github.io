@@ -28,36 +28,36 @@ tags: centos7 密码重置
 
    > 会进入如下图所示的修改界面
 
-   ![image-20230208103233660](../assets/images/20230208/image-20230208103233660.png)
+   ![image-20230208103233660](/assets/20230208/image-20230208103233660.png)
 
 2. 通过“方向键下”来到底，找到倒数第二行（以linux16开头，UTF-8结尾）
 
-   ![image-20230208103443283](../assets/images/20230208/image-20230208103443283.png)
+   ![image-20230208103443283](/assets/20230208/image-20230208103443283.png)
 
    > 在UTF-8后，先敲一个空格，再添加 **rw single  init=/bin/bash**
 
-   ![image-20230208115630741](../assets/images/20230208/image-20230208115630741.png)
+   ![image-20230208115630741](/assets/20230208/image-20230208115630741.png)
 
    > 按**ctrl +x**进行保存后，会来到如下的界面
 
-   ![image-20230208103837157](../assets/images/20230208/image-20230208103837157.png)
+   ![image-20230208103837157](/assets/20230208/image-20230208103837157.png)
 
 3. 通过**passwd root **命令，进行root密码的重置，按照提示输入新密码，输入完成后按回车键，需要输入两次
 
-   ![image-20230208104052004](../assets/images/20230208/image-20230208104052004.png)
+   ![image-20230208104052004](/assets/20230208/image-20230208104052004.png)
 
 4. 通过**touch /.autorelabel**命令使密码修改生效
 
-   ![image-20230208112540573](../assets/images/20230208/image-20230208112540573.png)
+   ![image-20230208112540573](/assets/20230208/image-20230208112540573.png)
 
 5. 通过**exec /sbin/init**命令来重启系统
 
-   ![image-20230208115951240](../assets/images/20230208/image-20230208115951240.png)
+   ![image-20230208115951240](/assets/20230208/image-20230208115951240.png)
 
-   ![image-20230208114751888](../assets/images/20230208/image-20230208114751888.png)
+   ![image-20230208114751888](/assets/20230208/image-20230208114751888.png)
 
 6. 经过正常的系统重启过程，来到正常登录界面，输入root和新修改的密码，正常登录
 
-   ![image-20230208115106457](../assets/images/20230208/image-20230208115106457.png)
+   ![image-20230208115106457](/assets/20230208/image-20230208115106457.png)
 
-[core_screen]: https://github.com/zcsee/zcsee.github.io/blob/main/assets/images/20230208/image-20230208103109282.png
+[core_screen]: https://github.com/zcsee/zcsee.github.io/blob/main/assets/20230208/image-20230208103109282.png
