@@ -2,7 +2,7 @@
 layout: post
 title: 'CentOS7单用户模式修改root密码'
 # subtitle: '通过shell脚本，进行redis批量迁移'
-date: 2023-02-06
+date: 2023-02-08
 categories: centos
 author: Jason
 # cover: 'assets/img/profile.png'
