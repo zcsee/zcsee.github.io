@@ -60,4 +60,4 @@ tags: centos7 密码重置
 
    ![image-20230208115106457](/assets/img/image-20230208115106457.png)
 
-[core_screen]: https://github.com/zcsee/zcsee.github.io/blob/main/assets/img/image-20230208103109282.png
+[core_screen]: /assets/img/image-20230208103109282.png
