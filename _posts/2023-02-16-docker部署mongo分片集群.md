@@ -571,7 +571,7 @@ rs.initiate({
 # 1、进入到分片服务器集群0的任一容器中
 docker exec -it mongo-shard0-0 bash
 # 2、登录mongo
-mongo --port 27018
+mongosh --port 27018
 # 3、初始分片副本集（https://www.cnblogs.com/ricklz/p/13237419.html）
 rs.initiate({
      _id: "rs0",
@@ -585,7 +585,7 @@ rs.initiate({
 # 1、进入到分片服务器集群1的任一容器中
 docker exec -it mongo-shard1-0 bash
 # 2、登录mongo
-mongo --port 27018
+mongosh --port 27018
 # 3、初始分片副本集（https://www.cnblogs.com/ricklz/p/13237419.html）
 rs.initiate({
      _id: "rs1",
@@ -601,7 +601,7 @@ rs.initiate({
 
 ```shell
 # 1、进入mongos容器并连接mongos。端口号与mongos配置文件中设定一致。
-docker exec -i mongos mongo --port 27017 #可以执行docker exec -it mongos /bin/bash进入容器，再执行mongo连接mongo。因为使用了默认端口27017，所以登录mongo的时候可以不设置端口号。
+docker exec -i mongos mongosh --port 27017 #可以执行docker exec -it mongos /bin/bash进入容器，再执行mongo连接mongo。因为使用了默认端口27017，所以登录mongo的时候可以不设置端口号。
 
 # 2、创建用户，
 use admin
@@ -670,7 +670,7 @@ for(var i=1;i<=1000;i++){
 db.user.stats()
 ```
 
-## 其他 mongo 常用命令
+## 其他 mongodb 常用命令
 
 ```shell
 ###################################  注意 #################################################
