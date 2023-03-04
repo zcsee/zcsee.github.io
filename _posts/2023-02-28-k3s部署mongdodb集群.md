@@ -62,12 +62,12 @@ mkdir -p /data/nfs-subdir-external-provisioner/deploy
 cd /data/nfs-subdir-external-provisioner/deploy
 # 按照环境的NFS参数修改后使用，主要是SERVER HOST，SHARE PATH
 
-# 修改class.yaml文件中的name为"managed-nfs-storage"，archiveOnDelete为"true"以储存数据
+# 修改class.yaml文件中的name为"nfs-client"，archiveOnDelete为"true"以储存数据
 # class.yaml
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: managed-nfs-storage
+  name: nfs-client
 provisioner: k8s-sigs.io/nfs-subdir-external-provisioner # or choose another name, must match deployment's env PROVISIONER_NAME'
 parameters:
   archiveOnDelete: "true"
@@ -202,6 +202,42 @@ service/kubernetes            ClusterIP      10.43.0.1     <none>        443/TCP
 
 NAME                                               PROVISIONER                                   RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
 storageclass.storage.k8s.io/nfs-client    k8s-sigs.io/nfs-subdir-external-provisioner   Delete          Immediate              false 
+
+# 测试nfs插件是否正常运行
+# test-claim.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: test-claim
+spec:
+  storageClassName: nfs-client
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Mi
+# test-pod.yaml
+kind: Pod
+apiVersion: v1
+metadata:
+  name: test-pod
+spec:
+  containers:
+  - name: test-pod
+    image: busybox:stable
+    command:
+      - "/bin/sh"
+    args:
+      - "-c"
+      - "touch /mnt/SUCCESS && exit 0 || exit 1"
+    volumeMounts:
+      - name: nfs-pvc
+        mountPath: "/mnt"
+  restartPolicy: "Never"
+  volumes:
+    - name: nfs-pvc
+      persistentVolumeClaim:
+        claimName: test-claim
 ```
 
 ## 2.MongoDB集群部署
@@ -289,7 +325,7 @@ spec:
       #annotations:
       #  volume.beta.kubernetes.io/storage-class: "standard"
     spec:
-      storageClassName: "managed-nfs-storage"
+      storageClassName: "nfs-client"
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
@@ -356,9 +392,9 @@ mongodb-cluster-2   1/1     Running   0          45m   10.42.0.6   c71    <none>
 ```shell
 ➜  ~ kubectl get pvc -n mongodb-cluster -o wide
 NAME                                                 STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS          AGE    VOLUMEMODE
-mongodb-persistent-storage-claim-mongodb-cluster-0   Bound    pvc-4316e16b-ec91-48ae-a821-0a65c07f5d50   1Gi        RWO            managed-nfs-storage   114m   Filesystem
-mongodb-persistent-storage-claim-mongodb-cluster-1   Bound    pvc-9584e76f-a667-4a51-9446-7ad431782b50   1Gi        RWO            managed-nfs-storage   45m    Filesystem
-mongodb-persistent-storage-claim-mongodb-cluster-2   Bound    pvc-468d3954-7f55-4b8d-bbc4-52f25c049141   1Gi        RWO            managed-nfs-storage   45m    Filesystem
+mongodb-persistent-storage-claim-mongodb-cluster-0   Bound    pvc-4316e16b-ec91-48ae-a821-0a65c07f5d50   1Gi        RWO            nfs-client   114m   Filesystem
+mongodb-persistent-storage-claim-mongodb-cluster-1   Bound    pvc-9584e76f-a667-4a51-9446-7ad431782b50   1Gi        RWO            nfs-client   45m    Filesystem
+mongodb-persistent-storage-claim-mongodb-cluster-2   Bound    pvc-468d3954-7f55-4b8d-bbc4-52f25c049141   1Gi        RWO            nfs-client   45m    Filesystem
 
 ```
 
@@ -369,9 +405,9 @@ mongodb-persistent-storage-claim-mongodb-cluster-2   Bound    pvc-468d3954-7f55-
 ```shell
 ➜  ~ kubectl get pv -o wide
 NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                                                                STORAGECLASS          REASON   AGE   VOLUMEMODE
-pvc-4316e16b-ec91-48ae-a821-0a65c07f5d50   1Gi        RWO            Delete           Bound    mongodb-cluster/mongodb-persistent-storage-claim-mongodb-cluster-0   managed-nfs-storage            73m   Filesystem
-pvc-9584e76f-a667-4a51-9446-7ad431782b50   1Gi        RWO            Delete           Bound    mongodb-cluster/mongodb-persistent-storage-claim-mongodb-cluster-1   managed-nfs-storage            45m   Filesystem
-pvc-468d3954-7f55-4b8d-bbc4-52f25c049141   1Gi        RWO            Delete           Bound    mongodb-cluster/mongodb-persistent-storage-claim-mongodb-cluster-2   managed-nfs-storage            45m   Filesystem
+pvc-4316e16b-ec91-48ae-a821-0a65c07f5d50   1Gi        RWO            Delete           Bound    mongodb-cluster/mongodb-persistent-storage-claim-mongodb-cluster-0   nfs-client            73m   Filesystem
+pvc-9584e76f-a667-4a51-9446-7ad431782b50   1Gi        RWO            Delete           Bound    mongodb-cluster/mongodb-persistent-storage-claim-mongodb-cluster-1   nfs-client            45m   Filesystem
+pvc-468d3954-7f55-4b8d-bbc4-52f25c049141   1Gi        RWO            Delete           Bound    mongodb-cluster/mongodb-persistent-storage-claim-mongodb-cluster-2   nfs-client            45m   Filesystem
 ```
 
 
