@@ -178,7 +178,7 @@ tags: helm mongodb k3s
 
 ## 验证过程
 
-1. 验证可以正常登录，在宿主机上执行
+1. 验证可以正常登录（在宿主机上执行）
 
    ```shell
    $ mongosh "mongodb://root:5gTU4o7g5g@localhost:30018"                                         
@@ -189,14 +189,10 @@ tags: helm mongodb k3s
    
    For mongosh info see: https://docs.mongodb.com/mongodb-shell/
    
-   ------
       The server generated these startup warnings when booting
       2023-03-27T07:56:15.146+00:00: /sys/kernel/mm/transparent_hugepage/enabled is 'always'. We suggest setting it to 'never'
       2023-03-27T07:56:15.146+00:00: /sys/kernel/mm/transparent_hugepage/defrag is 'always'. We suggest setting it to 'never'
       2023-03-27T07:56:15.146+00:00: vm.max_map_count is too low
-   ------
-   
-   ------
       Enable MongoDB's free cloud-based monitoring service, which will then receive and display
       metrics about your deployment (disk utilization, CPU, operation statistics, etc).
    
@@ -206,7 +202,6 @@ tags: helm mongodb k3s
    
       To enable free monitoring, run the following command: db.enableFreeMonitoring()
       To permanently disable this reminder, run the following command: db.disableFreeMonitoring()
-   ------
    
    rs0 [direct: primary] test> show dbs
    admin   140.00 KiB
