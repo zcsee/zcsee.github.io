@@ -178,163 +178,166 @@ tags: helm mongodb k3s
 
 ## 验证过程
 
-- 验证可以正常登录，在宿主机上执行
+1. 验证可以正常登录，在宿主机上执行
 
-  ```shell
-  $ mongosh "mongodb://root:5gTU4o7g5g@localhost:30018"                                         
-  Current Mongosh Log ID: 64214ccf3cbe33818f8d1f54
-  Connecting to:          mongodb://<credentials>@localhost:30018/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.8.0
-  Using MongoDB:          6.0.5
-  Using Mongosh:          1.8.0
-  
-  For mongosh info see: https://docs.mongodb.com/mongodb-shell/
-  
-  ------
-     The server generated these startup warnings when booting
-     2023-03-27T07:56:15.146+00:00: /sys/kernel/mm/transparent_hugepage/enabled is 'always'. We suggest setting it to 'never'
-     2023-03-27T07:56:15.146+00:00: /sys/kernel/mm/transparent_hugepage/defrag is 'always'. We suggest setting it to 'never'
-     2023-03-27T07:56:15.146+00:00: vm.max_map_count is too low
-  ------
-  
-  ------
-     Enable MongoDB's free cloud-based monitoring service, which will then receive and display
-     metrics about your deployment (disk utilization, CPU, operation statistics, etc).
-  
-     The monitoring data will be available on a MongoDB website with a unique URL accessible to you
-     and anyone you share the URL with. MongoDB may use this information to make product
-     improvements and to suggest MongoDB products and deployment options to you.
-  
-     To enable free monitoring, run the following command: db.enableFreeMonitoring()
-     To permanently disable this reminder, run the following command: db.disableFreeMonitoring()
-  ------
-  
-  rs0 [direct: primary] test> show dbs
-  admin   140.00 KiB
-  config  120.00 KiB
-  local   436.00 KiB
-  rs0 [direct: primary] test>
-  
-  ```
+   ```shell
+   $ mongosh "mongodb://root:5gTU4o7g5g@localhost:30018"                                         
+   Current Mongosh Log ID: 64214ccf3cbe33818f8d1f54
+   Connecting to:          mongodb://<credentials>@localhost:30018/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.8.0
+   Using MongoDB:          6.0.5
+   Using Mongosh:          1.8.0
+   
+   For mongosh info see: https://docs.mongodb.com/mongodb-shell/
+   
+   ------
+      The server generated these startup warnings when booting
+      2023-03-27T07:56:15.146+00:00: /sys/kernel/mm/transparent_hugepage/enabled is 'always'. We suggest setting it to 'never'
+      2023-03-27T07:56:15.146+00:00: /sys/kernel/mm/transparent_hugepage/defrag is 'always'. We suggest setting it to 'never'
+      2023-03-27T07:56:15.146+00:00: vm.max_map_count is too low
+   ------
+   
+   ------
+      Enable MongoDB's free cloud-based monitoring service, which will then receive and display
+      metrics about your deployment (disk utilization, CPU, operation statistics, etc).
+   
+      The monitoring data will be available on a MongoDB website with a unique URL accessible to you
+      and anyone you share the URL with. MongoDB may use this information to make product
+      improvements and to suggest MongoDB products and deployment options to you.
+   
+      To enable free monitoring, run the following command: db.enableFreeMonitoring()
+      To permanently disable this reminder, run the following command: db.disableFreeMonitoring()
+   ------
+   
+   rs0 [direct: primary] test> show dbs
+   admin   140.00 KiB
+   config  120.00 KiB
+   local   436.00 KiB
+   rs0 [direct: primary] test>
+   ```
 
-  
+   
 
--  查看集群状态
+2. 查看集群状态
 
-  ```shell
-  rs0 [direct: primary] admin> rs.status();
-  {
-    set: 'rs0',
-    date: ISODate("2023-03-27T08:01:24.596Z"),
-    myState: 1,
-    term: Long("2"),
-    syncSourceHost: '',
-    syncSourceId: -1,
-    heartbeatIntervalMillis: Long("2000"),
-    majorityVoteCount: 2,
-    writeMajorityCount: 2,
-    votingMembersCount: 3,
-    writableVotingMembersCount: 2,
-    optimes: {
-      lastCommittedOpTime: { ts: Timestamp({ t: 1679904075, i: 7 }), t: Long("2") },
-      lastCommittedWallTime: ISODate("2023-03-27T08:01:15.171Z"),
-      readConcernMajorityOpTime: { ts: Timestamp({ t: 1679904075, i: 7 }), t: Long("2") },
-      appliedOpTime: { ts: Timestamp({ t: 1679904075, i: 7 }), t: Long("2") },
-      durableOpTime: { ts: Timestamp({ t: 1679904075, i: 7 }), t: Long("2") },
-      lastAppliedWallTime: ISODate("2023-03-27T08:01:15.171Z"),
-      lastDurableWallTime: ISODate("2023-03-27T08:01:15.171Z")
-    },
-    lastStableRecoveryTimestamp: Timestamp({ t: 1679904075, i: 7 }),
-    electionCandidateMetrics: {
-      lastElectionReason: 'electionTimeout',
-      lastElectionDate: ISODate("2023-03-27T07:56:15.173Z"),
-      electionTerm: Long("2"),
-      lastCommittedOpTimeAtElection: { ts: Timestamp({ t: 0, i: 0 }), t: Long("-1") },
-      lastSeenOpTimeAtElection: { ts: Timestamp({ t: 1679903770, i: 14 }), t: Long("1") },
-      numVotesNeeded: 1,
-      priorityAtElection: 5,
-      electionTimeoutMillis: Long("10000"),
-      newTermStartDate: ISODate("2023-03-27T07:56:15.175Z"),
-      wMajorityWriteAvailabilityDate: ISODate("2023-03-27T07:56:15.177Z")
-    },
-    members: [
-      {
-        _id: 0,
-        name: '192.168.216.3:30018',
-        health: 1,
-        state: 1,
-        stateStr: 'PRIMARY',
-        uptime: 310,
-        optime: { ts: Timestamp({ t: 1679904075, i: 7 }), t: Long("2") },
-        optimeDate: ISODate("2023-03-27T08:01:15.000Z"),
-        lastAppliedWallTime: ISODate("2023-03-27T08:01:15.171Z"),
-        lastDurableWallTime: ISODate("2023-03-27T08:01:15.171Z"),
-        syncSourceHost: '',
-        syncSourceId: -1,
-        infoMessage: '',
-        electionTime: Timestamp({ t: 1679903775, i: 1 }),
-        electionDate: ISODate("2023-03-27T07:56:15.000Z"),
-        configVersion: 6,
-        configTerm: 2,
-        self: true,
-        lastHeartbeatMessage: ''
-      },
-      {
-        _id: 1,
-        name: '192.168.216.3:30019',
-        health: 1,
-        state: 2,
-        stateStr: 'SECONDARY',
-        uptime: 235,
-        optime: { ts: Timestamp({ t: 1679904075, i: 7 }), t: Long("2") },
-        optimeDurable: { ts: Timestamp({ t: 1679904075, i: 7 }), t: Long("2") },
-        optimeDate: ISODate("2023-03-27T08:01:15.000Z"),
-        optimeDurableDate: ISODate("2023-03-27T08:01:15.000Z"),
-        lastAppliedWallTime: ISODate("2023-03-27T08:01:15.171Z"),
-        lastDurableWallTime: ISODate("2023-03-27T08:01:15.171Z"),
-        lastHeartbeat: ISODate("2023-03-27T08:01:23.451Z"),
-        lastHeartbeatRecv: ISODate("2023-03-27T08:01:24.041Z"),
-        pingMs: Long("0"),
-        lastHeartbeatMessage: '',
-        syncSourceHost: '192.168.216.3:30018',
-        syncSourceId: 0,
-        infoMessage: '',
-        configVersion: 6,
-        configTerm: 2
-      },
-      {
-        _id: 2,
-        name: 'my-mongodb-arbiter-0.my-mongodb-arbiter-headless.default.svc.cluster.local:27017',
-        health: 1,
-        state: 7,
-        stateStr: 'ARBITER',
-        uptime: 273,
-        lastHeartbeat: ISODate("2023-03-27T08:01:23.440Z"),
-        lastHeartbeatRecv: ISODate("2023-03-27T08:01:24.056Z"),
-        pingMs: Long("0"),
-        lastHeartbeatMessage: '',
-        syncSourceHost: '',
-        syncSourceId: -1,
-        infoMessage: '',
-        configVersion: 6,
-        configTerm: 2
-      }
-    ],
-    ok: 1,
-    '$clusterTime': {
-      clusterTime: Timestamp({ t: 1679904075, i: 7 }),
-      signature: {
-        hash: Binary(Buffer.from("32a27425bfdc46cb14263701fc4d7702dcf4dac0", "hex"), 0),
-        keyId: Long("7215131752577105924")
-      }
-    },
-    operationTime: Timestamp({ t: 1679904075, i: 7 })
-  }
-  rs0 [direct: primary] admin>
-  ```
+   ```shell
+   rs0 [direct: primary] admin> rs.status();
+   {
+     set: 'rs0',
+     date: ISODate("2023-03-27T08:01:24.596Z"),
+     myState: 1,
+     term: Long("2"),
+     syncSourceHost: '',
+     syncSourceId: -1,
+     heartbeatIntervalMillis: Long("2000"),
+     majorityVoteCount: 2,
+     writeMajorityCount: 2,
+     votingMembersCount: 3,
+     writableVotingMembersCount: 2,
+     optimes: {
+       lastCommittedOpTime: { ts: Timestamp({ t: 1679904075, i: 7 }), t: Long("2") },
+       lastCommittedWallTime: ISODate("2023-03-27T08:01:15.171Z"),
+       readConcernMajorityOpTime: { ts: Timestamp({ t: 1679904075, i: 7 }), t: Long("2") },
+       appliedOpTime: { ts: Timestamp({ t: 1679904075, i: 7 }), t: Long("2") },
+       durableOpTime: { ts: Timestamp({ t: 1679904075, i: 7 }), t: Long("2") },
+       lastAppliedWallTime: ISODate("2023-03-27T08:01:15.171Z"),
+       lastDurableWallTime: ISODate("2023-03-27T08:01:15.171Z")
+     },
+     lastStableRecoveryTimestamp: Timestamp({ t: 1679904075, i: 7 }),
+     electionCandidateMetrics: {
+       lastElectionReason: 'electionTimeout',
+       lastElectionDate: ISODate("2023-03-27T07:56:15.173Z"),
+       electionTerm: Long("2"),
+       lastCommittedOpTimeAtElection: { ts: Timestamp({ t: 0, i: 0 }), t: Long("-1") },
+       lastSeenOpTimeAtElection: { ts: Timestamp({ t: 1679903770, i: 14 }), t: Long("1") },
+       numVotesNeeded: 1,
+       priorityAtElection: 5,
+       electionTimeoutMillis: Long("10000"),
+       newTermStartDate: ISODate("2023-03-27T07:56:15.175Z"),
+       wMajorityWriteAvailabilityDate: ISODate("2023-03-27T07:56:15.177Z")
+     },
+     members: [
+       {
+         _id: 0,
+         name: '192.168.216.3:30018',
+         health: 1,
+         state: 1,
+         stateStr: 'PRIMARY',
+         uptime: 310,
+         optime: { ts: Timestamp({ t: 1679904075, i: 7 }), t: Long("2") },
+         optimeDate: ISODate("2023-03-27T08:01:15.000Z"),
+         lastAppliedWallTime: ISODate("2023-03-27T08:01:15.171Z"),
+         lastDurableWallTime: ISODate("2023-03-27T08:01:15.171Z"),
+         syncSourceHost: '',
+         syncSourceId: -1,
+         infoMessage: '',
+         electionTime: Timestamp({ t: 1679903775, i: 1 }),
+         electionDate: ISODate("2023-03-27T07:56:15.000Z"),
+         configVersion: 6,
+         configTerm: 2,
+         self: true,
+         lastHeartbeatMessage: ''
+       },
+       {
+         _id: 1,
+         name: '192.168.216.3:30019',
+         health: 1,
+         state: 2,
+         stateStr: 'SECONDARY',
+         uptime: 235,
+         optime: { ts: Timestamp({ t: 1679904075, i: 7 }), t: Long("2") },
+         optimeDurable: { ts: Timestamp({ t: 1679904075, i: 7 }), t: Long("2") },
+         optimeDate: ISODate("2023-03-27T08:01:15.000Z"),
+         optimeDurableDate: ISODate("2023-03-27T08:01:15.000Z"),
+         lastAppliedWallTime: ISODate("2023-03-27T08:01:15.171Z"),
+         lastDurableWallTime: ISODate("2023-03-27T08:01:15.171Z"),
+         lastHeartbeat: ISODate("2023-03-27T08:01:23.451Z"),
+         lastHeartbeatRecv: ISODate("2023-03-27T08:01:24.041Z"),
+         pingMs: Long("0"),
+         lastHeartbeatMessage: '',
+         syncSourceHost: '192.168.216.3:30018',
+         syncSourceId: 0,
+         infoMessage: '',
+         configVersion: 6,
+         configTerm: 2
+       },
+       {
+         _id: 2,
+         name: 'my-mongodb-arbiter-0.my-mongodb-arbiter-headless.default.svc.cluster.local:27017',
+         health: 1,
+         state: 7,
+         stateStr: 'ARBITER',
+         uptime: 273,
+         lastHeartbeat: ISODate("2023-03-27T08:01:23.440Z"),
+         lastHeartbeatRecv: ISODate("2023-03-27T08:01:24.056Z"),
+         pingMs: Long("0"),
+         lastHeartbeatMessage: '',
+         syncSourceHost: '',
+         syncSourceId: -1,
+         infoMessage: '',
+         configVersion: 6,
+         configTerm: 2
+       }
+     ],
+     ok: 1,
+     '$clusterTime': {
+       clusterTime: Timestamp({ t: 1679904075, i: 7 }),
+       signature: {
+         hash: Binary(Buffer.from("32a27425bfdc46cb14263701fc4d7702dcf4dac0", "hex"), 0),
+         keyId: Long("7215131752577105924")
+       }
+     },
+     operationTime: Timestamp({ t: 1679904075, i: 7 })
+   }
+   rs0 [direct: primary] admin>
+   ```
+
+
 
 ## 参考文档
 
 [通过helm部署mongodb的3种部署方式](https://blog.csdn.net/weixin_42555971/article/details/126243336)
+
+[bitnami官网](https://artifacthub.io/packages/helm/bitnami/mongodb)
 
 ## 遗留问题
 
