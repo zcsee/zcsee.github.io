@@ -326,7 +326,17 @@ tags: helm mongodb k3s
    rs0 [direct: primary] admin>
    ```
 
+   
 
+3.  发现id为2的member不符合预期的secondary，而是一个arbiter，此处使用替换方法，将arbiter替换成原定的secondary
+
+   ```shell
+   cfg = rs.conf()
+   cfg.members[2].host = "192.168.216.3:30020"
+   rs.reconfig(cfg)
+   ```
+
+   
 
 ## 参考文档
 
@@ -337,3 +347,45 @@ tags: helm mongodb k3s
 ## 遗留问题
 
 - 在集群的主节点上，通过 rs.status()查看节点状态，发现本来id 2应该是secondary的，但实际上是arbiter的配置
+
+  经过多次反复部署发现，节点的数量与上一次部署时一致，怀疑是残留的配置导致的，**待证实**
+
+## mongodb常用命令
+
+1. 增加节点，可参考[mongodb官网增加节点](https://www.mongodb.com/docs/manual/tutorial/expand-replica-set/)部分
+
+   ```shell
+   rs.add( { host: "mongodb3.example.net:27017" } )
+   ```
+
+   
+
+2. 删除节点，可参考[mongodb官网删除节点](https://www.mongodb.com/docs/manual/tutorial/remove-replica-set-member/)部分
+
+   ```shell
+   rs.remove("mongod3.example.net:27017")
+   ```
+
+   
+
+3. 查看集群相关
+
+   ```shell
+   #查看集群状态
+   rs.status()
+   # 查看集群相关配置
+   rs.conf()
+   ```
+
+   
+
+4. 替换节点，可参考[mongodb官网替换节点](https://www.mongodb.com/docs/manual/tutorial/replace-replica-set-member/)部分
+
+   ```shell
+   cfg = rs.conf()
+   cfg.members[0].host = "mongo2.example.net"
+   rs.reconfig(cfg)
+   ```
+
+
+
