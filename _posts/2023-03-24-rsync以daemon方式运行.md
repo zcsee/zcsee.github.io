@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 'rsync使用测试'
+title: 'rsync使用'
 # subtitle: '通过shell脚本，进行redis批量迁移'
 date: 2023-03-24
 categories: shell
@@ -188,6 +188,44 @@ list = no
 
 
 ## rsync命令
+
+### 基础用法
+
+```shell
+# 本地模式
+Local:  rsync [OPTION...] SRC... [DEST]
+
+# 远程命令模式
+Access via remote shell:
+  Pull: rsync [OPTION...] [USER@]HOST:SRC... [DEST]
+  Push: rsync [OPTION...] SRC... [USER@]HOST:DEST
+
+# rsync daemonn模式
+Access via rsync daemon:
+  Pull: rsync [OPTION...] [USER@]HOST::SRC... [DEST]
+        rsync [OPTION...] rsync://[USER@]HOST[:PORT]/SRC... [DEST]
+  Push: rsync [OPTION...] SRC... [USER@]HOST::DEST
+        rsync [OPTION...] SRC... rsync://[USER@]HOST[:PORT]/DEST
+```
+
+
+
+### 服务端启动服务
+
+```shell
+systemctl start rsyncd
+```
+
+
+
+### 客户端同步相关模块
+
+```shell
+# 以同步backup模块为例
+rsync -avP root@192.168.216.3::backup /tmp/
+```
+
+
 
 ## 参数解析
 
