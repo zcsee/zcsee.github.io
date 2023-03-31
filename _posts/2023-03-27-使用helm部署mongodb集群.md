@@ -36,17 +36,15 @@ tags: helm mongodb k3s
        curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
        ```
 
-       
-
     2. 给脚本添加执行权限
 
-       ```
+       ```shell
        chmod +x get_helm.sh
        ```
 
     3. 执行安装脚本，此脚本将自动为您的系统找到正确的二进制文件。
 
-       ```
+       ```shell
        ./get_helm.sh
        ```
 
@@ -58,11 +56,9 @@ tags: helm mongodb k3s
 
 - 加入指定的helm仓库
 
-  ```
+  ```shell
   helm repo add my-repo https://charts.bitnami.com/bitnami
   ```
-
-  
 
 - 编写values.yaml
 
@@ -97,15 +93,11 @@ tags: helm mongodb k3s
        - 30020
   ```
 
-  
-
-
-
 ## 部署过程
 
 1. 进入指定目录
 
-   ```
+   ```shell
    cd /data/helm_mongodb
    ```
 
@@ -174,8 +166,6 @@ tags: helm mongodb k3s
    pod/my-mongodb-2                               1/1     Running     0              62s
    ```
 
-   
-
 ## 验证过程
 
 1. 验证可以正常登录（在宿主机上执行）
@@ -209,8 +199,6 @@ tags: helm mongodb k3s
    local   436.00 KiB
    rs0 [direct: primary] test>
    ```
-
-   
 
 2. 查看集群状态
 
@@ -326,17 +314,13 @@ tags: helm mongodb k3s
    rs0 [direct: primary] admin>
    ```
 
-   
-
-3.  发现id为2的member不符合预期的secondary，而是一个arbiter，此处使用替换方法，将arbiter替换成原定的secondary
+3. 发现id为2的member不符合预期的secondary，而是一个arbiter，此处使用替换方法，将arbiter替换成原定的secondary
 
    ```shell
    cfg = rs.conf()
    cfg.members[2].host = "192.168.216.3:30020"
    rs.reconfig(cfg)
    ```
-
-   
 
 ## 参考文档
 
@@ -358,15 +342,11 @@ tags: helm mongodb k3s
    rs.add( { host: "mongodb3.example.net:27017" } )
    ```
 
-   
-
 2. 删除节点，可参考[mongodb官网删除节点](https://www.mongodb.com/docs/manual/tutorial/remove-replica-set-member/)部分
 
    ```shell
    rs.remove("mongod3.example.net:27017")
    ```
-
-   
 
 3. 查看集群相关
 
@@ -377,8 +357,6 @@ tags: helm mongodb k3s
    rs.conf()
    ```
 
-   
-
 4. 替换节点，可参考[mongodb官网替换节点](https://www.mongodb.com/docs/manual/tutorial/replace-replica-set-member/)部分
 
    ```shell
@@ -386,6 +364,3 @@ tags: helm mongodb k3s
    cfg.members[0].host = "mongo2.example.net"
    rs.reconfig(cfg)
    ```
-
-
-

@@ -13,7 +13,7 @@ tags: rsync daemon
 
 作者
 
-**摘要**
+## 摘要
 
 试验rsync通过daemon方式运行
 
@@ -45,7 +45,7 @@ syslog facility
 
 #### 模块参数
 
-```
+```shell
 主要是定义服务器哪个目录要被同步。其格式必须为“[module]”形式，这个名字就是在rsync客户端看到的名字，其实有点象Samba服务器提供的共享名。而服务器真正同步的数据是通过 path来指定的。我们可以根据自己的需要，来指定多个模块，模块中可以定义以下参数：
 
 comment
@@ -141,8 +141,6 @@ dont compress
 用来指定那些不进行压缩处理再传输的文件，默认值是*.gz *.tgz *.zip *.z *.rpm *.deb *.iso *.bz2 *.tbz
 ```
 
-
-
 ### 配置文件示例
 
 ```shell
@@ -185,8 +183,6 @@ hosts allow = 192.168.216.0/24
 list = no
 ```
 
-
-
 ## rsync命令
 
 ### 基础用法
@@ -208,15 +204,11 @@ Access via rsync daemon:
         rsync [OPTION...] SRC... rsync://[USER@]HOST[:PORT]/DEST
 ```
 
-
-
 ### 服务端启动服务
 
 ```shell
 systemctl start rsyncd
 ```
-
-
 
 ### 客户端同步相关模块
 
@@ -224,8 +216,6 @@ systemctl start rsyncd
 # 以同步backup模块为例
 rsync -avP root@192.168.216.3::backup /tmp/
 ```
-
-
 
 ## 参数解析
 
@@ -293,9 +283,6 @@ rsync -avP root@192.168.216.3::backup /tmp/
 -h, --help显示帮助信息
 ```
 
-
-
 ## 参考网站
 
 [rsync网站](https://linux.die.net/man/1/rsync)
-
