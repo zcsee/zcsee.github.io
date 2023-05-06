@@ -21,13 +21,13 @@ tags: docker kafka 集群
 
 ### 部署zookeeper
 
-#### 拉取镜像
+#### 拉取zookeeper镜像
 
 ```shell
 docker pull wurstmeister/zookeeper
 ```
 
-#### 启动容器
+#### 启动zookeeper容器
 
 ```shell
 docker run -d --network dockerKafka --ip 172.173.0.9 --name zookeeper -p 2181:2181 -t wurstmeister/zookeeper
@@ -38,13 +38,13 @@ ss -nltp | grep 2181
 
 ### 搭建kafka集群
 
-#### 拉取镜像
+#### 拉取kafka镜像
 
 ```shell
 docker pull wurstmeister/kafka
 ```
 
-#### 启动容器
+#### 启动kafka容器
 
 ```shell
 # 修改id和端口，以在同一台虚机上跑kafka集群
@@ -413,6 +413,3 @@ root@737c61919753:/opt/kafka_2.13-2.8.1/bin# ./kafka-console-consumer.sh --boots
 hello
 
 ```
-
-
-
