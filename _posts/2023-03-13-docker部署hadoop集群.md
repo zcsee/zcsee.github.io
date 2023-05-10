@@ -1,10 +1,10 @@
 ---
 layout: post
-title: 'Kafka设定指定groupId的消费者组的指定日期的offset'
-date: 2023-03-12
+title: 'docker部署hadoop集群'
+date: 2023-03-13
 categories: 中间件
 author: Jason
-tags: Kafka 日期 offset 消费者组
+tags: hadoop 集群 docker
 ---
 
 
