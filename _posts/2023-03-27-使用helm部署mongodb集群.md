@@ -9,7 +9,7 @@ author: Jason
 tags: helm mongodb k3s
 ---
 
-# 使用helm部署mongodb副本集群
+## 使用helm部署mongodb副本集群
 
 ## 场景
 
