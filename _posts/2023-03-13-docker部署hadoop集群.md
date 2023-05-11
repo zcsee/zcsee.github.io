@@ -192,7 +192,7 @@ ping DSlave02-315
 cd /usr/local/hadoop/etc/hadoop
 ```
 
-## 传送到DSlave01-315
+## 传送文件到DSlave01-315
 
 ```shell
 scp slaves root@DSlave01-315:/usr/local/hadoop/etc/hadoop/
@@ -203,7 +203,7 @@ scp core-site.xml root@DSlave01-315:/usr/local/hadoop/etc/hadoop
 scp -r /home/data/hadoopdata root@DSlave01-315:/home/
 ```
 
-## 传送到DSlave02-315
+## 传送文件到DSlave02-315
 
 ```shell
 scp slaves root@DSlave02-315:/usr/local/hadoop/etc/hadoop/
