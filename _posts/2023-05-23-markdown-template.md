@@ -84,7 +84,7 @@ mindmap
       Mermaid
 ```
 
-# Markdown Cheat Sheet Markdown基本语法
+## Markdown Cheat Sheet Markdown基本语法
 
 Thanks for visiting [The Markdown Guide](https://www.markdownguide.org)!
 
@@ -155,7 +155,7 @@ These elements extend the basic syntax by adding additional features. Not all Ma
 
 ### Fenced Code Block
 
-```
+```json
 {
   "firstName": "John",
   "lastName": "Smith",
