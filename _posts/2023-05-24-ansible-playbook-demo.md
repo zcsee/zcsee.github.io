@@ -104,9 +104,9 @@ tags: ansible playbook demo
 
 Parameters
 
-| Parameter                                             | Comments                                                                                                                                                                                                                                                                         |
-| ----------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **chdir** path*added in Ansible 0.6*               | Change into this directory before running the command.                                                                                                    |
+| Parameter                                           | Comments                                                                                                                                                  |
+| --------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **chdir** path*added in Ansible 0.6*                | Change into this directory before running the command.                                                                                                    |
 | **cmd** string                                      | The command to run followed by optional arguments.                                                                                                        |
 | **creates** path                                    | A filename, when it already exists, this step will **not** be run.                                                                                        |
 | **executable** path*added in Ansible 0.9*           | Change the shell used to execute the command.This expects an absolute path to the executable.                                                             |
@@ -116,12 +116,12 @@ Parameters
 | **stdin_add_newline** boolean*added in Ansible 2.8* | Whether to append a newline to stdin data.**Choices:**` false``true ` ← (default)                                                                         |
 
 Attributes
-| Attribute      | Support                                                                                                                                                | Description                                                                                                    |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
-| **check_mode** | **Support:** **partial**while the command itself is arbitrary and cannot be subject to the check mode semantics it adds `creates`/`removes` options as a workaround | Can run in check_mode and return changed status prediction without modifying target                            |
-| **diff_mode**   | **Support:** **none**                                                                                                                                               | Will return details on what has changed (or possibly needs changing in check_mode), when in diff mode          |
-| **platform**    | **Platform:** **posix**                                                                                                                                             | Target OS/families that can be operated against                                                                |
-| **raw**         | **Support:** **full**                                                                                                                                               | Indicates if an action takes a ‘raw’ or ‘free form’ string as an option and has it’s own special parsing of it |
+| Attribute | Support | Description |
+| --------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **check_mode** | **Support:** **partial**while the command itself is arbitrary and cannot be subject to the check mode semantics it adds `creates`/`removes` options as a workaround | Can run in check_mode and return changed status prediction without modifying target |
+| **diff_mode** | **Support:** **none** | Will return details on what has changed (or possibly needs changing in check_mode), when in diff mode |
+| **platform** | **Platform:** **posix** | Target OS/families that can be operated against |
+| **raw** | **Support:** **full** | Indicates if an action takes a ‘raw’ or ‘free form’ string as an option and has it’s own special parsing of it |
 
 Examples
 
