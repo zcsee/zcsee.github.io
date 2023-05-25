@@ -62,6 +62,7 @@ pie title "动物饼图"
     "Dog": 1
     "Cat": 2
     "Rabiit": 3
+    "sb": 1
 ```
 
 ```mermaid
@@ -84,7 +85,7 @@ mindmap
       Mermaid
 ```
 
-## Markdown Cheat Sheet Markdown基本语法
+## Markdown Cheat Sheet Markdown 基本语法
 
 Thanks for visiting [The Markdown Guide](https://www.markdownguide.org)!
 
