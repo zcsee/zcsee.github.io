@@ -102,7 +102,7 @@ tags: ansible playbook demo
 
 [官网参考文档](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html)
 
-Parameters
+### Parameters
 
 | Parameter                                           | Comments                                                                                                                                                  |
 | --------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -115,7 +115,8 @@ Parameters
 | **stdin** string*added in Ansible 2.4*              | Set the stdin of the command directly to the specified value.                                                                                             |
 | **stdin_add_newline** boolean*added in Ansible 2.8* | Whether to append a newline to stdin data.**Choices:**` false``true ` ← (default)                                                                         |
 
-Attributes
+### Attributes
+
 | Attribute | Support | Description |
 | ------ | :------ |:------|
 | **check_mode** | **partial**<br/>while the command itself is arbitrary and cannot be subject to the check mode semantics it adds `creates`/`removes` options as a workaround | Can run in check_mode and return changed status prediction without modifying target |
@@ -123,7 +124,7 @@ Attributes
 | **platform** | **Platform:** **posix** | Target OS/families that can be operated against |
 | **raw** | **Support:** **full** | Indicates if an action takes a ‘raw’ or ‘free form’ string as an option and has it’s own special parsing of it |
 
-Examples
+### Examples
 
 ```yaml
 - name: Execute the command in remote shell; stdout goes to the specified file on the remote
@@ -176,7 +177,7 @@ Examples
   delegate_to: localhost
 ```
 
-Return Values
+### Return Values
 
 | Key                                     | Description                                                                                                                                                      |
 | --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -439,71 +440,575 @@ Return Values
 
 **Parameters**
 
+| Parameter                                                 | Comments                                                     |
+| --------------------------------------------------------- | ------------------------------------------------------------ |
+| **access_time** string*added in Ansible 2.7*              | This parameter indicates the time the file’s access time should be set to.Should be `preserve` when no modification is required, `YYYYMMDDHHMM.SS` when using default time format, or `now`. <br>Default is `None` meaning that `preserve` is the default for `state=[file,directory,link,hard]` and `now` is default for `state=touch`. |
+| **access_time_format** string*added in Ansible 2.7*       | When used with `access_time`, indicates the time format that must be used.Based on default Python format (see time.strftime doc).<br>**Default:** `"%Y%m%d%H%M.%S"` |
+| **attributes** aliases: attrstring*added in Ansible 2.3*  | The attributes the resulting filesystem object should have.To get supported flags look at the man page for *chattr* on the target system.This string should contain the attributes in the same order as the one displayed by *lsattr*.The `=` operator is assumed as default, otherwise `+` or `-` operators need to be included in the string. |
+| **follow** boolean*added in Ansible 1.8*                  | This flag indicates that filesystem links, if they exist, should be followed.*follow=yes* and *state=link* can modify *src* when combined with parameters such as *mode*.Previous to Ansible 2.5, this was `false` by default.<br>**Choices:**`false`<br>           `true` ← (default) |
+| **force** boolean                                         | Force the creation of the symlinks in two cases: the source file does not exist (but will appear later); the destination exists and is a file (so, we need to unlink the `path` file and create symlink to the `src` file in place of it).<br>**Choices:**`false` ← (default)`true` |
+| **group** string                                          | Name of the group that should own the filesystem object, as would be fed to *chown*.When left unspecified, it uses the current group of the current user unless you are root, in which case it can preserve the previous ownership. |
+| **mode** any                                              | The permissions the resulting filesystem object should have.For those used to */usr/bin/chmod* remember that modes are actually octal numbers. You must either add a leading zero so that Ansible’s YAML parser knows it is an octal number (like `0644` or `01777`) or quote it (like `'644'` or `'1777'`) so Ansible receives a string and can do its own conversion from string into number.Giving Ansible a number without following one of these rules will end up with a decimal number which will have unexpected results.As of Ansible 1.8, the mode may be specified as a symbolic mode (for example, `u+rwx` or `u=rw,g=r,o=r`).If `mode` is not specified and the destination filesystem object **does not** exist, the default `umask` on the system will be used when setting the mode for the newly created filesystem object.If `mode` is not specified and the destination filesystem object **does** exist, the mode of the existing filesystem object will be used.Specifying `mode` is the best way to ensure filesystem objects are created with the correct permissions. See CVE-2020-1736 for further details. |
+| **modification_time** string*added in Ansible 2.7*        | This parameter indicates the time the file’s modification time should be set to.Should be `preserve` when no modification is required, `YYYYMMDDHHMM.SS` when using default time format, or `now`.Default is None meaning that `preserve` is the default for `state=[file,directory,link,hard]` and `now` is default for `state=touch`. |
+| **modification_time_format** string*added in Ansible 2.7* | When used with `modification_time`, indicates the time format that must be used.Based on default Python format (see time.strftime doc).**Default:** `"%Y%m%d%H%M.%S"` |
+| **owner** string                                          | Name of the user that should own the filesystem object, as would be fed to *chown*.When left unspecified, it uses the current user unless you are root, in which case it can preserve the previous ownership.Specifying a numeric username will be assumed to be a user ID and not a username. Avoid numeric usernames to avoid this confusion. |
+| **path** aliases: dest, namepath / required               | Path to the file being managed.                              |
+| **recurse** boolean*added in Ansible 1.1*                 | Recursively set the specified file attributes on directory contents.This applies only when `state` is set to `directory`.**Choices:**`false` ← (default)`true` |
+| **selevel** string                                        | The level part of the SELinux filesystem object context.This is the MLS/MCS attribute, sometimes known as the `range`.When set to `_default`, it will use the `level` portion of the policy if available. |
+| **serole** string                                         | The role part of the SELinux filesystem object context.When set to `_default`, it will use the `role` portion of the policy if available. |
+| **setype** string                                         | The type part of the SELinux filesystem object context.When set to `_default`, it will use the `type` portion of the policy if available. |
+| **seuser** string                                         | The user part of the SELinux filesystem object context.By default it uses the `system` policy, where applicable.When set to `_default`, it will use the `user` portion of the policy if available. |
+| **src** path                                              | Path of the file to link to.This applies only to `state=link` and `state=hard`.For `state=link`, this will also accept a non-existing path.Relative paths are relative to the file being created (`path`) which is how the Unix command `ln -s SRC DEST` treats relative paths. |
+| **state** string                                          | If `absent`, directories will be recursively deleted, and files or symlinks will be unlinked. In the case of a directory, if `diff` is declared, you will see the files and folders deleted listed under `path_contents`. Note that `absent` will not cause `file` to fail if the `path` does not exist as the state did not change.If `directory`, all intermediate subdirectories will be created if they do not exist. Since Ansible 1.7 they will be created with the supplied permissions.If `file`, with no other options, returns the current state of `path`.If `file`, even with other options (such as `mode`), the file will be modified if it exists but will NOT be created if it does not exist. Set to `touch` or use the [ansible.builtin.copy](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html#ansible-collections-ansible-builtin-copy-module) or [ansible.builtin.template](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/template_module.html#ansible-collections-ansible-builtin-template-module) module if you want to create the file if it does not exist.If `hard`, the hard link will be created or changed.If `link`, the symbolic link will be created or changed.If `touch` (new in 1.4), an empty file will be created if the file does not exist, while an existing file or directory will receive updated file access and modification times (similar to the way `touch` works from the command line).Default is the current state of the file if it exists, `directory` if `recurse=yes`, or `file` otherwise.**Choices:**`"absent"``"directory"``"file"``"hard"``"link"``"touch"` |
+| **unsafe_writes** boolean*added in Ansible 2.2*           | Influence when to use atomic operation to prevent data corruption or inconsistent reads from the target filesystem object.By default this module uses atomic operations to prevent data corruption or inconsistent reads from the target filesystem objects, but sometimes systems are configured or just broken in ways that prevent this. One example is docker mounted filesystem objects, which cannot be updated atomically from inside the container and can only be written in an unsafe manner.This option allows Ansible to fall back to unsafe methods of updating filesystem objects when atomic operations fail (however, it doesn’t force Ansible to perform unsafe writes).IMPORTANT! Unsafe writes are subject to race conditions and can lead to data corruption.**Choices:**`false` ← (default)`true` |
+
 **Attributes**
+
+| Attribute      | Support                                                      | Description                                                  |
+| -------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| **check_mode** | **full**                                                     | Can run in check_mode and return changed status prediction without modifying target |
+| **diff_mode**  | **partial**permissions and ownership will be shown but file contents on absent/touch will not. | Will return details on what has changed (or possibly needs changing in check_mode), when in diff mode |
+| **platform**   | **Platform:** **posix**                                      | Target OS/families that can be operated against              |
 
 **Examples**
 
+```yaml
+- name: Change file ownership, group and permissions
+  ansible.builtin.file:
+    path: /etc/foo.conf
+    owner: foo
+    group: foo
+    mode: '0644'
+
+- name: Give insecure permissions to an existing file
+  ansible.builtin.file:
+    path: /work
+    owner: root
+    group: root
+    mode: '1777'
+
+- name: Create a symbolic link
+  ansible.builtin.file:
+    src: /file/to/link/to
+    dest: /path/to/symlink
+    owner: foo
+    group: foo
+    state: link
+
+- name: Create two hard links
+  ansible.builtin.file:
+    src: '/tmp/{{ item.src }}'
+    dest: '{{ item.dest }}'
+    state: hard
+  loop:
+    - { src: x, dest: y }
+    - { src: z, dest: k }
+
+- name: Touch a file, using symbolic modes to set the permissions (equivalent to 0644)
+  ansible.builtin.file:
+    path: /etc/foo.conf
+    state: touch
+    mode: u=rw,g=r,o=r
+
+- name: Touch the same file, but add/remove some permissions
+  ansible.builtin.file:
+    path: /etc/foo.conf
+    state: touch
+    mode: u+rw,g-wx,o-rwx
+
+- name: Touch again the same file, but do not change times this makes the task idempotent
+  ansible.builtin.file:
+    path: /etc/foo.conf
+    state: touch
+    mode: u+rw,g-wx,o-rwx
+    modification_time: preserve
+    access_time: preserve
+
+- name: Create a directory if it does not exist
+  ansible.builtin.file:
+    path: /etc/some_directory
+    state: directory
+    mode: '0755'
+
+- name: Update modification and access time of given file
+  ansible.builtin.file:
+    path: /etc/some_file
+    state: file
+    modification_time: now
+    access_time: now
+
+- name: Set access time based on seconds from epoch value
+  ansible.builtin.file:
+    path: /etc/another_file
+    state: file
+    access_time: '{{ "%Y%m%d%H%M.%S" | strftime(stat_var.stat.atime) }}'
+
+- name: Recursively change ownership of a directory
+  ansible.builtin.file:
+    path: /etc/foo
+    state: directory
+    recurse: yes
+    owner: foo
+    group: foo
+
+- name: Remove file (delete file)
+  ansible.builtin.file:
+    path: /etc/foo.txt
+    state: absent
+
+- name: Recursively remove directory
+  ansible.builtin.file:
+    path: /etc/foo
+    state: absent
+```
+
 **Return Values**
+
+| Key             | Description                                                  |
+| --------------- | ------------------------------------------------------------ |
+| **dest** string | Destination file/path, equal to the value passed to *path*.**Returned:** state=touch, state=hard, state=link**Sample:** `"/path/to/file.txt"` |
+| **path** string | Destination file/path, equal to the value passed to *path*.**Returned:** state=absent, state=directory, state=file**Sample:** `"/path/to/file.txt"` |
 
 ## unarchive 模块
 
 [官网参考文档](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/unarchive_module.html)
 
-Parameters
+**Parameters**
 
-Attributes
+| Parameter                                                    | Comments                                                     |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| **attributes** aliases: attrstring*added in Ansible 2.3*     | The attributes the resulting filesystem object should have.To get supported flags look at the man page for *chattr* on the target system.This string should contain the attributes in the same order as the one displayed by *lsattr*.The `=` operator is assumed as default, otherwise `+` or `-` operators need to be included in the string. |
+| **copy** boolean                                             | If true, the file is copied from local controller to the managed (remote) node, otherwise, the plugin will look for src archive on the managed machine.This option has been deprecated in favor of `remote_src`.This option is mutually exclusive with `remote_src`.**Choices:**`false``true` ← (default) |
+| **creates** path*added in Ansible 1.6*                       | If the specified absolute path (file or directory) already exists, this step will **not** be run.The specified absolute path (file or directory) must be below the base path given with `dest:`. |
+| **decrypt** boolean*added in Ansible 2.4*                    | This option controls the autodecryption of source files using vault.**Choices:**`false``true` ← (default) |
+| **dest** path / required                                     | Remote absolute path where the archive should be unpacked.The given path must exist. Base directory is not created by this module. |
+| **exclude** list / elements=string*added in Ansible 2.1*     | List the directory and file entries that you would like to exclude from the unarchive action.Mutually exclusive with `include`.**Default:** `[]` |
+| **extra_opts** list / elements=string*added in Ansible 2.1*  | Specify additional options by passing in an array.Each space-separated command-line option should be a new element of the array. See examples.Command-line options with multiple elements must use multiple lines in the array, one for each element.**Default:** `[""]` |
+| **group** string                                             | Name of the group that should own the filesystem object, as would be fed to *chown*.When left unspecified, it uses the current group of the current user unless you are root, in which case it can preserve the previous ownership. |
+| **include** list / elements=string*added in ansible-core 2.11* | List of directory and file entries that you would like to extract from the archive. If `include` is not empty, only files listed here will be extracted.Mutually exclusive with `exclude`.**Default:** `[]` |
+| **io_buffer_size** integer*added in ansible-core 2.12*       | Size of the volatile memory buffer that is used for extracting files from the archive in bytes.**Default:** `65536` |
+| **keep_newer** boolean*added in Ansible 2.1*                 | Do not replace existing files that are newer than files from the archive.**Choices:**`false` ← (default)`true` |
+| **list_files** boolean*added in Ansible 2.0*                 | If set to True, return the list of files that are contained in the tarball.**Choices:**`false` ← (default)`true` |
+| **mode** any                                                 | The permissions the resulting filesystem object should have.For those used to */usr/bin/chmod* remember that modes are actually octal numbers. You must either add a leading zero so that Ansible’s YAML parser knows it is an octal number (like `0644` or `01777`) or quote it (like `'644'` or `'1777'`) so Ansible receives a string and can do its own conversion from string into number.Giving Ansible a number without following one of these rules will end up with a decimal number which will have unexpected results.As of Ansible 1.8, the mode may be specified as a symbolic mode (for example, `u+rwx` or `u=rw,g=r,o=r`).If `mode` is not specified and the destination filesystem object **does not** exist, the default `umask` on the system will be used when setting the mode for the newly created filesystem object.If `mode` is not specified and the destination filesystem object **does** exist, the mode of the existing filesystem object will be used.Specifying `mode` is the best way to ensure filesystem objects are created with the correct permissions. See CVE-2020-1736 for further details. |
+| **owner** string                                             | Name of the user that should own the filesystem object, as would be fed to *chown*.When left unspecified, it uses the current user unless you are root, in which case it can preserve the previous ownership.Specifying a numeric username will be assumed to be a user ID and not a username. Avoid numeric usernames to avoid this confusion. |
+| **remote_src** boolean*added in Ansible 2.2*                 | Set to `true` to indicate the archived file is already on the remote system and not local to the Ansible controller.This option is mutually exclusive with `copy`.**Choices:**`false` ← (default)`true` |
+| **selevel** string                                           | The level part of the SELinux filesystem object context.This is the MLS/MCS attribute, sometimes known as the `range`.When set to `_default`, it will use the `level` portion of the policy if available. |
+| **serole** string                                            | The role part of the SELinux filesystem object context.When set to `_default`, it will use the `role` portion of the policy if available. |
+| **setype** string                                            | The type part of the SELinux filesystem object context.When set to `_default`, it will use the `type` portion of the policy if available. |
+| **seuser** string                                            | The user part of the SELinux filesystem object context.By default it uses the `system` policy, where applicable.When set to `_default`, it will use the `user` portion of the policy if available. |
+| **src** path / required                                      | If `remote_src=no` (default), local path to archive file to copy to the target server; can be absolute or relative. If `remote_src=yes`, path on the target server to existing archive file to unpack.If `remote_src=yes` and `src` contains `://`, the remote machine will download the file from the URL first. (version_added 2.0). This is only for simple cases, for full download support use the [ansible.builtin.get_url](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/get_url_module.html#ansible-collections-ansible-builtin-get-url-module) module. |
+| **unsafe_writes** boolean*added in Ansible 2.2*              | Influence when to use atomic operation to prevent data corruption or inconsistent reads from the target filesystem object.By default this module uses atomic operations to prevent data corruption or inconsistent reads from the target filesystem objects, but sometimes systems are configured or just broken in ways that prevent this. One example is docker mounted filesystem objects, which cannot be updated atomically from inside the container and can only be written in an unsafe manner.This option allows Ansible to fall back to unsafe methods of updating filesystem objects when atomic operations fail (however, it doesn’t force Ansible to perform unsafe writes).IMPORTANT! Unsafe writes are subject to race conditions and can lead to data corruption.**Choices:**`false` ← (default)`true` |
+| **validate_certs** boolean*added in Ansible 2.2*             | This only applies if using a https URL as the source of the file.This should only set to `false` used on personally controlled sites using self-signed certificate.Prior to 2.2 the code worked as if this was set to `true`.**Choices:**`false``true` ← (default) |
 
-Examples
+**Attributes**
 
-Return Values
+| Attribute                | Support                                                      | Description                                                  |
+| ------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| **action**               | **full**                                                     | Indicates this has a corresponding action plugin so some parts of the options can be executed on the controller |
+| **async**                | **none**                                                     | Supports being used with the `async` keyword                 |
+| **bypass_host_loop**     | **none**                                                     | Forces a ‘global’ task that does not execute per host, this bypasses per host templating and serial, throttle and other loop considerationsConditionals will work as if `run_once` is being used, variables used will be from the first available hostThis action will not work normally outside of lockstep strategies |
+| **check_mode**           | **partial**Not supported for gzipped tar files.              | Can run in check_mode and return changed status prediction without modifying target |
+| **diff_mode**            | **partial**Uses gtar’s `--diff` arg to calculate if changed or not. If this `arg` is not supported, it will always unpack the archive. | Will return details on what has changed (or possibly needs changing in check_mode), when in diff mode |
+| **platform**             | **Platform:** **posix**                                      | Target OS/families that can be operated against              |
+| **safe_file_operations** | **none**                                                     | Uses Ansible’s strict file operation functions to ensure proper permissions and avoid data corruption |
+| **vault**                | **full**                                                     | Can automatically decrypt Ansible vaulted files              |
+
+**Examples**
+
+```yaml
+- name: Extract foo.tgz into /var/lib/foo
+  ansible.builtin.unarchive:
+    src: foo.tgz
+    dest: /var/lib/foo
+
+- name: Unarchive a file that is already on the remote machine
+  ansible.builtin.unarchive:
+    src: /tmp/foo.zip
+    dest: /usr/local/bin
+    remote_src: yes
+
+- name: Unarchive a file that needs to be downloaded (added in 2.0)
+  ansible.builtin.unarchive:
+    src: https://example.com/example.zip
+    dest: /usr/local/bin
+    remote_src: yes
+
+- name: Unarchive a file with extra options
+  ansible.builtin.unarchive:
+    src: /tmp/foo.zip
+    dest: /usr/local/bin
+    extra_opts:
+    - --transform
+    - s/^xxx/yyy/
+```
+
+**Return Values**
+
+| Key                              | Description                                                  |
+| -------------------------------- | ------------------------------------------------------------ |
+| **dest** string                  | Path to the destination directory. <br>**Returned:** always <br/>**Sample:** `"/opt/software"` |
+| **files** list / elements=string | List of all the files in the archive. <br/>**Returned:** When *list_files* is True <br/>**Sample:** `["[\"file1\"", " \"file2\"]"]` |
+| **gid** integer                  | Numerical ID of the group that owns the destination directory. <br/>**Returned:** always <br/>**Sample:** `1000` |
+| **group** string                 | Name of the group that owns the destination directory. <br/>**Returned:** always <br/>**Sample:** `"librarians"` |
+| **handler** string               | Archive software handler used to extract and decompress the archive. <br/>**Returned:** always <br/>**Sample:** `"TgzArchive"` |
+| **mode** string                  | String that represents the octal permissions of the destination directory. <br/>**Returned:** always <br/>**Sample:** `"0755"` |
+| **owner** string                 | Name of the user that owns the destination directory. <br/>**Returned:** always <br/>**Sample:** `"paul"` |
+| **size** integer                 | The size of destination directory in bytes. Does not include the size of files or subdirectories contained within. <br/>**Returned:** always <br/>**Sample:** `36` |
+| **src** string                   | The source archive’s path.If *src* was a remote web URL, or from the local ansible controller, this shows the temporary location where the download was stored. <br/>**Returned:** always <br/>**Sample:** `"/home/paul/test.tar.gz"` |
+| **state** string                 | State of the destination. Effectively always “directory”. <br/>**Returned:** always <br/>**Sample:** `"directory"` |
+| **uid** integer                  | Numerical ID of the user that owns the destination directory. <br/>**Returned:** always <br/>**Sample:** `1000` |
 
 ## archive 模块
 
 [官网参考文档](https://docs.ansible.com/ansible/latest/collections/community/general/archive_module.html)
 
-Parameters
+**Parameters**
 
-Attributes
+| Parameter                                                    | Comments                                                     |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| **attributes** aliases: attrstring*added in Ansible 2.3*     | The attributes the resulting filesystem object should have.To get supported flags look at the man page for *chattr* on the target system.This string should contain the attributes in the same order as the one displayed by *lsattr*.The `=` operator is assumed as default, otherwise `+` or `-` operators need to be included in the string. |
+| **dest** path                                                | The file name of the destination archive. The parent directory must exists on the remote host.This is required when `path` refers to multiple files by either specifying a glob, a directory or multiple paths in a list.If the destination archive already exists, it will be truncated and overwritten. |
+| **exclude_path** list / elements=path                        | Remote absolute path, glob, or list of paths or globs for the file or files to exclude from *path* list and glob expansion.Use *exclusion_patterns* to instead exclude files or subdirectories below any of the paths from the *path* list.**Default:** `[]` |
+| **exclusion_patterns** list / elements=path*added in community.general 3.2.0* | Glob style patterns to exclude files or directories from the resulting archive.This differs from *exclude_path* which applies only to the source paths from *path*. |
+| **force_archive** boolean                                    | Allows you to force the module to treat this as an archive even if only a single file is specified.By default when a single file is specified it is compressed only (not archived).Enable this if you want to use [ansible.builtin.unarchive](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/unarchive_module.html#ansible-collections-ansible-builtin-unarchive-module) on an archive of a single file created with this module.**Choices:**`false` ← (default)`true` |
+| **format** string                                            | The type of compression to use.Support for xz was added in Ansible 2.5.**Choices:**`"bz2"``"gz"` ← (default)`"tar"``"xz"``"zip"` |
+| **group** string                                             | Name of the group that should own the filesystem object, as would be fed to *chown*.When left unspecified, it uses the current group of the current user unless you are root, in which case it can preserve the previous ownership. |
+| **mode** any                                                 | The permissions the resulting filesystem object should have.For those used to */usr/bin/chmod* remember that modes are actually octal numbers. You must either add a leading zero so that Ansible’s YAML parser knows it is an octal number (like `0644` or `01777`) or quote it (like `'644'` or `'1777'`) so Ansible receives a string and can do its own conversion from string into number.Giving Ansible a number without following one of these rules will end up with a decimal number which will have unexpected results.As of Ansible 1.8, the mode may be specified as a symbolic mode (for example, `u+rwx` or `u=rw,g=r,o=r`).If `mode` is not specified and the destination filesystem object **does not** exist, the default `umask` on the system will be used when setting the mode for the newly created filesystem object.If `mode` is not specified and the destination filesystem object **does** exist, the mode of the existing filesystem object will be used.Specifying `mode` is the best way to ensure filesystem objects are created with the correct permissions. See CVE-2020-1736 for further details. |
+| **owner** string                                             | Name of the user that should own the filesystem object, as would be fed to *chown*.When left unspecified, it uses the current user unless you are root, in which case it can preserve the previous ownership.Specifying a numeric username will be assumed to be a user ID and not a username. Avoid numeric usernames to avoid this confusion. |
+| **path** list / elements=path / required                     | Remote absolute path, glob, or list of paths or globs for the file or files to compress or archive. |
+| **remove** boolean                                           | Remove any added source files and trees after adding to archive.**Choices:**`false` ← (default)`true` |
+| **selevel** string                                           | The level part of the SELinux filesystem object context.This is the MLS/MCS attribute, sometimes known as the `range`.When set to `_default`, it will use the `level` portion of the policy if available. |
+| **serole** string                                            | The role part of the SELinux filesystem object context.When set to `_default`, it will use the `role` portion of the policy if available. |
+| **setype** string                                            | The type part of the SELinux filesystem object context.When set to `_default`, it will use the `type` portion of the policy if available. |
+| **seuser** string                                            | The user part of the SELinux filesystem object context.By default it uses the `system` policy, where applicable.When set to `_default`, it will use the `user` portion of the policy if available. |
+| **unsafe_writes** boolean*added in Ansible 2.2*              | Influence when to use atomic operation to prevent data corruption or inconsistent reads from the target filesystem object.By default this module uses atomic operations to prevent data corruption or inconsistent reads from the target filesystem objects, but sometimes systems are configured or just broken in ways that prevent this. One example is docker mounted filesystem objects, which cannot be updated atomically from inside the container and can only be written in an unsafe manner.This option allows Ansible to fall back to unsafe methods of updating filesystem objects when atomic operations fail (however, it doesn’t force Ansible to perform unsafe writes).IMPORTANT! Unsafe writes are subject to race conditions and can lead to data corruption.**Choices:**`false` ← (default)`true` |
 
-Examples
+**Attributes**
 
-Return Values
+| Attribute      | Support  | Description                                                  |
+| -------------- | -------- | ------------------------------------------------------------ |
+| **check_mode** | **full** | Can run in `check_mode` and return changed status prediction without modifying target. |
+| **diff_mode**  | **none** | Will return details on what has changed (or possibly needs changing in `check_mode`), when in diff mode. |
+
+**Examples**
+
+```yaml
+- name: Compress directory /path/to/foo/ into /path/to/foo.tgz
+  community.general.archive:
+    path: /path/to/foo
+    dest: /path/to/foo.tgz
+
+- name: Compress regular file /path/to/foo into /path/to/foo.gz and remove it
+  community.general.archive:
+    path: /path/to/foo
+    remove: true
+
+- name: Create a zip archive of /path/to/foo
+  community.general.archive:
+    path: /path/to/foo
+    format: zip
+
+- name: Create a bz2 archive of multiple files, rooted at /path
+  community.general.archive:
+    path:
+    - /path/to/foo
+    - /path/wong/foo
+    dest: /path/file.tar.bz2
+    format: bz2
+
+- name: Create a bz2 archive of a globbed path, while excluding specific dirnames
+  community.general.archive:
+    path:
+    - /path/to/foo/*
+    dest: /path/file.tar.bz2
+    exclude_path:
+    - /path/to/foo/bar
+    - /path/to/foo/baz
+    format: bz2
+
+- name: Create a bz2 archive of a globbed path, while excluding a glob of dirnames
+  community.general.archive:
+    path:
+    - /path/to/foo/*
+    dest: /path/file.tar.bz2
+    exclude_path:
+    - /path/to/foo/ba*
+    format: bz2
+
+- name: Use gzip to compress a single archive (i.e don't archive it first with tar)
+  community.general.archive:
+    path: /path/to/foo/single.file
+    dest: /path/file.gz
+    format: gz
+
+- name: Create a tar.gz archive of a single file.
+  community.general.archive:
+    path: /path/to/foo/single.file
+    dest: /path/file.tar.gz
+    format: gz
+    force_archive: true
+```
+
+**Return Values**
+
+| Key                                                     | Description                                                  |
+| ------------------------------------------------------- | ------------------------------------------------------------ |
+| **archived** list / elements=string                     | Any files that were compressed or added to the archive.**Returned:** success |
+| **arcroot** string                                      | The archive root.**Returned:** always                        |
+| **dest_state** string*added in community.general 3.4.0* | The state of the *dest* file.`absent` when the file does not exist.`archive` when the file is an archive.`compress` when the file is compressed, but not an archive.`incomplete` when the file is an archive, but some files under *path* were not found.**Returned:** success |
+| **expanded_exclude_paths** list / elements=string       | The list of matching exclude paths from the exclude_path argument.**Returned:** always |
+| **expanded_paths** list / elements=string               | The list of matching paths from paths argument.**Returned:** always |
+| **missing** list / elements=string                      | Any files that were missing from the source.**Returned:** success |
+| **state** string                                        | The state of the input `path`.**Returned:** always           |
 
 ## hostname 模块
 
 [官网参考文档](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/hostname_module.html)
 
-Parameters
+**Parameters**
 
-Attributes
+| Parameter                             | Comments                                                     |
+| ------------------------------------- | ------------------------------------------------------------ |
+| **name** string / required            | Name of the host.If the value is a fully qualified domain name that does not resolve from the given host, this will cause the module to hang for a few seconds while waiting for the name resolution attempt to timeout. |
+| **use** string *added in Ansible 2.9* | Which strategy to use to update the hostname.If not set we try to autodetect, but this can be problematic, particularly with containers as they can present misleading information.Note that ‘systemd’ should be specified for RHEL/EL/CentOS 7+. Older distributions should use ‘redhat’.<br>**Choices:**`"alpine"``"debian"``"freebsd"``"generic"``"macos"``"macosx"``"darwin"``"openbsd"``"openrc"``"redhat"``"sles"``"solaris"``"systemd"` |
 
-Examples
+**Attributes**
 
-Return Values
+| Attribute      | Support                 | Description                                                  |
+| -------------- | ----------------------- | ------------------------------------------------------------ |
+| **check_mode** | **full**                | Can run in check_mode and return changed status prediction without modifying target |
+| **diff_mode**  | **full**                | Will return details on what has changed (or possibly needs changing in check_mode), when in diff mode |
+| **facts**      | **full**                | Action returns an `ansible_facts` dictionary that will update existing host facts |
+| **platform**   | **Platform:** **posix** | Target OS/families that can be operated against              |
+
+**Examples**
+
+```yaml
+- name: Set a hostname
+  ansible.builtin.hostname:
+    name: web01
+
+- name: Set a hostname specifying strategy
+  ansible.builtin.hostname:
+    name: web01
+    use: systemd
+```
 
 ## cron 模块
 
 [官网参考文档](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/cron_module.html)
 
-Parameters
+**Parameters**
 
-Attributes
+| Parameter                                     | Comments                                                     |
+| --------------------------------------------- | ------------------------------------------------------------ |
+| **backup** boolean                            | If set, create a backup of the crontab before it is modified. The location of the backup is returned in the `backup_file` variable by this module.**Choices:**`false` ← (default)`true` |
+| **cron_file** path                            | If specified, uses this file instead of an individual user’s crontab. The assumption is that this file is exclusively managed by the module, do not use if the file contains multiple entries, NEVER use for /etc/crontab.If this is a relative path, it is interpreted with respect to */etc/cron.d*.Many linux distros expect (and some require) the filename portion to consist solely of upper- and lower-case letters, digits, underscores, and hyphens.Using this parameter requires you to specify the *user* as well, unless *state* is not *present*.Either this parameter or *name* is required |
+| **day** aliases: domstring                    | Day of the month the job should run (`1-31`, `*`, `*/2`, and so on).**Default:** `"*"` |
+| **disabled** boolean*added in Ansible 2.0*    | If the job should be disabled (commented out) in the crontab.Only has effect if *state=present*.**Choices:**`false` ← (default)`true` |
+| **env** boolean*added in Ansible 2.1*         | If set, manages a crontab’s environment variable.New variables are added on top of crontab.*name* and *value* parameters are the name and the value of environment variable.**Choices:**`false` ← (default)`true` |
+| **hour** string                               | Hour when the job should run (`0-23`, `*`, `*/2`, and so on).**Default:** `"*"` |
+| **insertafter** string*added in Ansible 2.1*  | Used with *state=present* and *env*.If specified, the environment variable will be inserted after the declaration of specified environment variable. |
+| **insertbefore** string*added in Ansible 2.1* | Used with *state=present* and *env*.If specified, the environment variable will be inserted before the declaration of specified environment variable. |
+| **job** aliases: valuestring                  | The command to execute or, if env is set, the value of environment variable.The command should not contain line breaks.Required if *state=present*. |
+| **minute** string                             | Minute when the job should run (`0-59`, `*`, `*/2`, and so on).**Default:** `"*"` |
+| **month** string                              | Month of the year the job should run (`1-12`, `*`, `*/2`, and so on).**Default:** `"*"` |
+| **name** string / required                    | Description of a crontab entry or, if env is set, the name of environment variable.This parameter is always required as of ansible-core 2.12. |
+| **special_time** string*added in Ansible 1.3* | Special time specification nickname.**Choices:**`"annually"``"daily"``"hourly"``"monthly"``"reboot"``"weekly"``"yearly"` |
+| **state** string                              | Whether to ensure the job or environment variable is present or absent.**Choices:**`"absent"``"present"` ← (default) |
+| **user** string                               | The specific user whose crontab should be modified.When unset, this parameter defaults to the current user. |
+| **weekday** aliases: dowstring                | Day of the week that the job should run (`0-6` for Sunday-Saturday, `*`, and so on).**Default:** `"*"` |
 
-Examples
+**Attributes**
 
-Return Values
+| Attribute      | Support                 | Description                                                  |
+| -------------- | ----------------------- | ------------------------------------------------------------ |
+| **check_mode** | **full**                | Can run in check_mode and return changed status prediction without modifying target |
+| **diff_mode**  | **full**                | Will return details on what has changed (or possibly needs changing in check_mode), when in diff mode |
+| **platform**   | **Platform:** **posix** | Target OS/families that can be operated against              |
+
+**Examples**
+
+```yaml
+- name: Ensure a job that runs at 2 and 5 exists. Creates an entry like "0 5,2 * * ls -alh > /dev/null"
+  ansible.builtin.cron:
+    name: "check dirs"
+    minute: "0"
+    hour: "5,2"
+    job: "ls -alh > /dev/null"
+
+- name: 'Ensure an old job is no longer present. Removes any job that is prefixed by "#Ansible: an old job" from the crontab'
+  ansible.builtin.cron:
+    name: "an old job"
+    state: absent
+
+- name: Creates an entry like "@reboot /some/job.sh"
+  ansible.builtin.cron:
+    name: "a job for reboot"
+    special_time: reboot
+    job: "/some/job.sh"
+
+- name: Creates an entry like "PATH=/opt/bin" on top of crontab
+  ansible.builtin.cron:
+    name: PATH
+    env: yes
+    job: /opt/bin
+
+- name: Creates an entry like "APP_HOME=/srv/app" and insert it after PATH declaration
+  ansible.builtin.cron:
+    name: APP_HOME
+    env: yes
+    job: /srv/app
+    insertafter: PATH
+
+- name: Creates a cron file under /etc/cron.d
+  ansible.builtin.cron:
+    name: yum autoupdate
+    weekday: "2"
+    minute: "0"
+    hour: "12"
+    user: root
+    job: "YUMINTERACTIVE=0 /usr/sbin/yum-autoupdate"
+    cron_file: ansible_yum-autoupdate
+
+- name: Removes a cron file from under /etc/cron.d
+  ansible.builtin.cron:
+    name: "yum autoupdate"
+    cron_file: ansible_yum-autoupdate
+    state: absent
+
+- name: Removes "APP_HOME" environment variable from crontab
+  ansible.builtin.cron:
+    name: APP_HOME
+    env: yes
+    state: absent
+```
 
 ## yum_repository 模块
 
 [官网参考文档](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/yum_repository_module.html)
 
-Parameters
+### Parameters
 
-Attributes
+| Parameter                                                | Comments                                                     |
+| -------------------------------------------------------- | ------------------------------------------------------------ |
+| **async** boolean                                        | If set to `true` Yum will download packages and metadata from this repo in parallel, if possible.In ansible-core 2.11, 2.12, and 2.13 the default value is `true`.This option has been deprecated in RHEL 8. If you’re using one of the versions listed above, you can set this option to None to avoid passing an unknown configuration option.**Choices:**`false``true` |
+| **attributes** aliases: attrstring*added in Ansible 2.3* | The attributes the resulting filesystem object should have.To get supported flags look at the man page for *chattr* on the target system.This string should contain the attributes in the same order as the one displayed by *lsattr*.The `=` operator is assumed as default, otherwise `+` or `-` operators need to be included in the string. |
+| **bandwidth** string                                     | Maximum available network bandwidth in bytes/second. Used with the *throttle* option.If *throttle* is a percentage and bandwidth is `0` then bandwidth throttling will be disabled. If *throttle* is expressed as a data rate (bytes/sec) then this option is ignored. Default is `0` (no bandwidth throttling).**Default:** `"0"` |
+| **baseurl** list / elements=string                       | URL to the directory where the yum repository’s ‘repodata’ directory lives.It can also be a list of multiple URLs.This, the *metalink* or *mirrorlist* parameters are required if *state* is set to `present`. |
+| **cost** string                                          | Relative cost of accessing this repository. Useful for weighing one repo’s packages as greater/less than any other.**Default:** `"1000"` |
+| **deltarpm_metadata_percentage** string                  | When the relative size of deltarpm metadata vs pkgs is larger than this, deltarpm metadata is not downloaded from the repo. Note that you can give values over `100`, so `200` means that the metadata is required to be half the size of the packages. Use `0` to turn off this check, and always download metadata.**Default:** `"100"` |
+| **deltarpm_percentage** string                           | When the relative size of delta vs pkg is larger than this, delta is not used. Use `0` to turn off delta rpm processing. Local repositories (with [file://](file:///) *baseurl*) have delta rpms turned off by default.**Default:** `"75"` |
+| **description** string                                   | A human readable string describing the repository. This option corresponds to the “name” property in the repo file.This parameter is only required if *state* is set to `present`. |
+| **enabled** boolean                                      | This tells yum whether or not use this repository.Yum default value is `true`.**Choices:**`false``true` |
+| **enablegroups** boolean                                 | Determines whether yum will allow the use of package groups for this repository.Yum default value is `true`.**Choices:**`false``true` |
+| **exclude** list / elements=string                       | List of packages to exclude from updates or installs. This should be a space separated list. Shell globs using wildcards (eg. `*` and `?`) are allowed.The list can also be a regular YAML array. |
+| **failovermethod** string                                | `roundrobin` randomly selects a URL out of the list of URLs to start with and proceeds through each of them as it encounters a failure contacting the host.`priority` starts from the first *baseurl* listed and reads through them sequentially.**Choices:**`"roundrobin"` ← (default)`"priority"` |
+| **file** string                                          | File name without the `.repo` extension to save the repo in. Defaults to the value of *name*. |
+| **gpgcakey** string                                      | A URL pointing to the ASCII-armored CA key file for the repository. |
+| **gpgcheck** boolean                                     | Tells yum whether or not it should perform a GPG signature check on packages.No default setting. If the value is not set, the system setting from `/etc/yum.conf` or system default of `false` will be used.**Choices:**`false``true` |
+| **gpgkey** list / elements=string                        | A URL pointing to the ASCII-armored GPG key file for the repository.It can also be a list of multiple URLs. |
+| **group** string                                         | Name of the group that should own the filesystem object, as would be fed to *chown*.When left unspecified, it uses the current group of the current user unless you are root, in which case it can preserve the previous ownership. |
+| **http_caching** string                                  | Determines how upstream HTTP caches are instructed to handle any HTTP downloads that Yum does.`all` means that all HTTP downloads should be cached.`packages` means that only RPM package downloads should be cached (but not repository metadata downloads).`none` means that no HTTP downloads should be cached.**Choices:**`"all"` ← (default)`"packages"``"none"` |
+| **include** string                                       | Include external configuration file. Both, local path and URL is supported. Configuration file will be inserted at the position of the *include=* line. Included files may contain further include lines. Yum will abort with an error if an inclusion loop is detected. |
+| **includepkgs** list / elements=string                   | List of packages you want to only use from a repository. This should be a space separated list. Shell globs using wildcards (eg. `*` and `?`) are allowed. Substitution variables (e.g. `$releasever`) are honored here.The list can also be a regular YAML array. |
+| **ip_resolve** string                                    | Determines how yum resolves host names.`4` or `IPv4` - resolve to IPv4 addresses only.`6` or `IPv6` - resolve to IPv6 addresses only.**Choices:**`"4"``"6"``"IPv4"``"IPv6"``"whatever"` ← (default) |
+| **keepalive** boolean                                    | This tells yum whether or not HTTP/1.1 keepalive should be used with this repository. This can improve transfer speeds by using one connection when downloading multiple files from a repository.**Choices:**`false` ← (default)`true` |
+| **keepcache** string                                     | Either `1` or `0`. Determines whether or not yum keeps the cache of headers and packages after successful installation.**Choices:**`"0"``"1"` ← (default) |
+| **metadata_expire** string                               | Time (in seconds) after which the metadata will expire.Default value is 6 hours.**Default:** `"21600"` |
+| **metadata_expire_filter** string                        | Filter the *metadata_expire* time, allowing a trade of speed for accuracy if a command doesn’t require it. Each yum command can specify that it requires a certain level of timeliness quality from the remote repos. from “I’m about to install/upgrade, so this better be current” to “Anything that’s available is good enough”.`never` - Nothing is filtered, always obey *metadata_expire*.`read-only:past` - Commands that only care about past information are filtered from metadata expiring. Eg. *yum history* info (if history needs to lookup anything about a previous transaction, then by definition the remote package was available in the past).`read-only:present` - Commands that are balanced between past and future. Eg. *yum list yum*.`read-only:future` - Commands that are likely to result in running other commands which will require the latest metadata. Eg. *yum check-update*.Note that this option does not override “yum clean expire-cache”.**Choices:**`"never"``"read-only:past"``"read-only:present"` ← (default)`"read-only:future"` |
+| **metalink** string                                      | Specifies a URL to a metalink file for the repomd.xml, a list of mirrors for the entire repository are generated by converting the mirrors for the repomd.xml file to a *baseurl*.This, the *baseurl* or *mirrorlist* parameters are required if *state* is set to `present`. |
+| **mirrorlist** string                                    | Specifies a URL to a file containing a list of baseurls.This, the *baseurl* or *metalink* parameters are required if *state* is set to `present`. |
+| **mirrorlist_expire** string                             | Time (in seconds) after which the mirrorlist locally cached will expire.Default value is 6 hours.**Default:** `"21600"` |
+| **mode** any                                             | The permissions the resulting filesystem object should have.For those used to */usr/bin/chmod* remember that modes are actually octal numbers. You must either add a leading zero so that Ansible’s YAML parser knows it is an octal number (like `0644` or `01777`) or quote it (like `'644'` or `'1777'`) so Ansible receives a string and can do its own conversion from string into number.Giving Ansible a number without following one of these rules will end up with a decimal number which will have unexpected results.As of Ansible 1.8, the mode may be specified as a symbolic mode (for example, `u+rwx` or `u=rw,g=r,o=r`).If `mode` is not specified and the destination filesystem object **does not** exist, the default `umask` on the system will be used when setting the mode for the newly created filesystem object.If `mode` is not specified and the destination filesystem object **does** exist, the mode of the existing filesystem object will be used.Specifying `mode` is the best way to ensure filesystem objects are created with the correct permissions. See CVE-2020-1736 for further details. |
+| **module_hotfixes** boolean*added in ansible-core 2.11*  | Disable module RPM filtering and make all RPMs from the repository available. The default is `None`.**Choices:**`false``true` |
+| **name** string / required                               | Unique repository ID. This option builds the section name of the repository in the repo file.This parameter is only required if *state* is set to `present` or `absent`. |
+| **owner** string                                         | Name of the user that should own the filesystem object, as would be fed to *chown*.When left unspecified, it uses the current user unless you are root, in which case it can preserve the previous ownership.Specifying a numeric username will be assumed to be a user ID and not a username. Avoid numeric usernames to avoid this confusion. |
+| **password** string                                      | Password to use with the username for basic authentication.  |
+| **priority** string                                      | Enforce ordered protection of repositories. The value is an integer from 1 to 99.This option only works if the YUM Priorities plugin is installed.**Default:** `"99"` |
+| **protect** boolean                                      | Protect packages from updates from other repositories.**Choices:**`false` ← (default)`true` |
+| **proxy** string                                         | URL to the proxy server that yum should use. Set to `_none_` to disable the global proxy setting. |
+| **proxy_password** string                                | Password for this proxy.                                     |
+| **proxy_username** string                                | Username to use for proxy.                                   |
+| **repo_gpgcheck** boolean                                | This tells yum whether or not it should perform a GPG signature check on the repodata from this repository.**Choices:**`false` ← (default)`true` |
+| **reposdir** path                                        | Directory where the `.repo` files will be stored.**Default:** `"/etc/yum.repos.d"` |
+| **retries** string                                       | Set the number of times any attempt to retrieve a file should retry before returning an error. Setting this to `0` makes yum try forever.**Default:** `"10"` |
+| **s3_enabled** boolean                                   | Enables support for S3 repositories.This option only works if the YUM S3 plugin is installed.**Choices:**`false` ← (default)`true` |
+| **selevel** string                                       | The level part of the SELinux filesystem object context.This is the MLS/MCS attribute, sometimes known as the `range`.When set to `_default`, it will use the `level` portion of the policy if available. |
+| **serole** string                                        | The role part of the SELinux filesystem object context.When set to `_default`, it will use the `role` portion of the policy if available. |
+| **setype** string                                        | The type part of the SELinux filesystem object context.When set to `_default`, it will use the `type` portion of the policy if available. |
+| **seuser** string                                        | The user part of the SELinux filesystem object context.By default it uses the `system` policy, where applicable.When set to `_default`, it will use the `user` portion of the policy if available. |
+| **skip_if_unavailable** boolean                          | If set to `true` yum will continue running if this repository cannot be contacted for any reason. This should be set carefully as all repos are consulted for any given command.**Choices:**`false` ← (default)`true` |
+| **ssl_check_cert_permissions** boolean                   | Whether yum should check the permissions on the paths for the certificates on the repository (both remote and local).If we can’t read any of the files then yum will force *skip_if_unavailable* to be `true`. This is most useful for non-root processes which use yum on repos that have client cert files which are readable only by root.**Choices:**`false` ← (default)`true` |
+| **sslcacert** aliases: ca_certstring                     | Path to the directory containing the databases of the certificate authorities yum should use to verify SSL certificates. |
+| **sslclientcert** aliases: client_certstring             | Path to the SSL client certificate yum should use to connect to repos/remote sites. |
+| **sslclientkey** aliases: client_keystring               | Path to the SSL client key yum should use to connect to repos/remote sites. |
+| **sslverify** aliases: validate_certsboolean             | Defines whether yum should verify SSL certificates/hosts at all.**Choices:**`false``true` ← (default) |
+| **state** string                                         | State of the repo file.**Choices:**`"absent"``"present"` ← (default) |
+| **throttle** string                                      | Enable bandwidth throttling for downloads.This option can be expressed as a absolute data rate in bytes/sec. An SI prefix (k, M or G) may be appended to the bandwidth value. |
+| **timeout** string                                       | Number of seconds to wait for a connection before timing out.**Default:** `"30"` |
+| **ui_repoid_vars** string                                | When a repository id is displayed, append these yum variables to the string if they are used in the *baseurl*/etc. Variables are appended in the order listed (and found).**Default:** `"releasever basearch"` |
+| **unsafe_writes** boolean*added in Ansible 2.2*          | Influence when to use atomic operation to prevent data corruption or inconsistent reads from the target filesystem object.By default this module uses atomic operations to prevent data corruption or inconsistent reads from the target filesystem objects, but sometimes systems are configured or just broken in ways that prevent this. One example is docker mounted filesystem objects, which cannot be updated atomically from inside the container and can only be written in an unsafe manner.This option allows Ansible to fall back to unsafe methods of updating filesystem objects when atomic operations fail (however, it doesn’t force Ansible to perform unsafe writes).IMPORTANT! Unsafe writes are subject to race conditions and can lead to data corruption.**Choices:**`false` ← (default)`true` |
+| **username** string                                      | Username to use for basic authentication to a repo or really any url. |
 
-Examples
+### Attributes
 
-Return Values
+| Attribute      | Support                | Description                                                  |
+| -------------- | ---------------------- | ------------------------------------------------------------ |
+| **check_mode** | **full**               | Can run in check_mode and return changed status prediction without modifying target |
+| **diff_mode**  | **full**               | Will return details on what has changed (or possibly needs changing in check_mode), when in diff mode |
+| **platform**   | **Platform:** **rhel** | Target OS/families that can be operated against              |
+
+### Examples
+
+```yaml
+- name: Add repository
+  ansible.builtin.yum_repository:
+    name: epel
+    description: EPEL YUM repo
+    baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/
+
+- name: Add multiple repositories into the same file (1/2)
+  ansible.builtin.yum_repository:
+    name: epel
+    description: EPEL YUM repo
+    file: external_repos
+    baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/
+    gpgcheck: no
+
+- name: Add multiple repositories into the same file (2/2)
+  ansible.builtin.yum_repository:
+    name: rpmforge
+    description: RPMforge YUM repo
+    file: external_repos
+    baseurl: http://apt.sw.be/redhat/el7/en/$basearch/rpmforge
+    mirrorlist: http://mirrorlist.repoforge.org/el7/mirrors-rpmforge
+    enabled: no
+
+# Handler showing how to clean yum metadata cache
+- name: yum-clean-metadata
+  ansible.builtin.command: yum clean metadata
+
+# Example removing a repository and cleaning up metadata cache
+- name: Remove repository (and clean up left-over metadata)
+  ansible.builtin.yum_repository:
+    name: epel
+    state: absent
+  notify: yum-clean-metadata
+
+- name: Remove repository from a specific repo file
+  ansible.builtin.yum_repository:
+    name: epel
+    file: external_repos
+    state: absent
+```
+
+### Return Values
+
+| Key              | Description                                                  |
+| ---------------- | ------------------------------------------------------------ |
+| **repo** string  | repository name<br>**Returned:** success<br>**Sample:** `"epel"` |
+| **state** string | state of the target, after execution<br>**Returned:** success<br>**Sample:** `"present"` |
 
 ## dnf 模块
 
