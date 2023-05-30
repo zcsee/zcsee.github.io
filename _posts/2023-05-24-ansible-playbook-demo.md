@@ -1014,23 +1014,210 @@ tags: ansible playbook demo
 
 [官网参考文档](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/dnf_module.html)
 
-Parameters
+### Parameters
 
-Attributes
+| Parameter                                                    | Comments                                                     |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| **allow_downgrade** boolean*added in Ansible 2.7*            | Specify if the named package and version is allowed to downgrade a maybe already installed higher version of that package. Note that setting allow_downgrade=True can make this module behave in a non-idempotent way. The task could end up with a set of packages that does not match the complete list of specified packages to install (because dependencies between the downgraded package and others can cause changes to the packages which were in the earlier transaction).<br>**Choices:**`false` ← (default)<br>`true` |
+| **allowerasing** boolean*added in ansible-base 2.10*         | If `true` it allows erasing of installed packages to resolve dependencies.<br>**Choices:**`false` ← (default)<br>`true` |
+| **autoremove** boolean*added in Ansible 2.4*                 | If `true`, removes all “leaf” packages from the system that were originally installed as dependencies of user-installed packages but which are no longer required by any such package. Should be used alone or when state is *absent*<br>**Choices:**`false` ← (default)<br>`true` |
+| **bugfix** boolean*added in Ansible 2.7*                     | If set to `true`, and `state=latest` then only installs updates that have been marked bugfix related.Note that, similar to `dnf upgrade-minimal`, this filter applies to dependencies as well.<br>**Choices:**`false` ← (default)<br>`true` |
+| **cacheonly** boolean*added in ansible-core 2.12*            | Tells dnf to run entirely from system cache; does not download or update metadata.<br>**Choices:**`false` ← (default)<br>`true` |
+| **conf_file** string                                         | The remote dnf configuration file to use for the transaction. |
+| **disable_excludes** string*added in Ansible 2.7*            | Disable the excludes defined in DNF config files.If set to `all`, disables all excludes.If set to `main`, disable excludes defined in [main] in dnf.conf.If set to `repoid`, disable excludes defined for given repo id. |
+| **disable_gpg_check** boolean                                | Whether to disable the GPG checking of signatures of packages being installed. Has an effect only if state is *present* or *latest*.This setting affects packages installed from a repository as well as “local” packages installed from the filesystem or a URL.<br>**Choices:**`false` ← (default)<br />`true` |
+| **disable_plugin** list / elements=string*added in Ansible 2.7* | *Plugin* name to disable for the install/update operation. The disabled plugins will not persist beyond the transaction. |
+| **disablerepo** list / elements=string                       | *Repoid* of repositories to disable for the install/update operation. These repos will not persist beyond the transaction. When specifying multiple repos, separate them with a “,”. |
+| **download_dir** string*added in Ansible 2.8*                | Specifies an alternate directory to store packages.Has an effect only if *download_only* is specified. |
+| **download_only** boolean*added in Ansible 2.7*              | Only download the packages, do not install them.<br>**Choices:**`false` ← (default)<br>`true` |
+| **enable_plugin** list / elements=string*added in Ansible 2.7* | *Plugin* name to enable for the install/update operation. The enabled plugin will not persist beyond the transaction. |
+| **enablerepo** list / elements=string                        | *Repoid* of repositories to enable for the install/update operation. These repos will not persist beyond the transaction. When specifying multiple repos, separate them with a “,”. |
+| **exclude** list / elements=string*added in Ansible 2.7*     | Package name(s) to exclude when state=present, or latest. This can be a list or a comma separated string. |
+| **install_repoquery** boolean*added in Ansible 2.7*          | This is effectively a no-op in DNF as it is not needed with DNF, but is an accepted parameter for feature parity/compatibility with the *yum* module.<br>**Choices:**`false`<br>`true` ← (default) |
+| **install_weak_deps** boolean*added in Ansible 2.8*          | Will also install all packages linked by a weak dependency relation.<br>**Choices:**`false`<br>`true` ← (default) |
+| **installroot** string*added in Ansible 2.3*                 | Specifies an alternative installroot, relative to which all packages will be installed.<br>**Default:** `"/"` |
+| **list** string                                              | Various (non-idempotent) commands for usage with `/usr/bin/ansible` and *not* playbooks. Use [ansible.builtin.package_facts](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/package_facts_module.html#ansible-collections-ansible-builtin-package-facts-module) instead of the `list` argument as a best practice. |
+| **lock_timeout** integer*added in Ansible 2.8*               | Amount of time to wait for the dnf lockfile to be freed.<br>**Default:** `30` |
+| **name** aliases: pkglist / elements=string / required       | A package name or package specifier with version, like `name-1.0`. When using state=latest, this can be ‘*’ which means run: dnf -y update. You can also pass a url or a local path to a rpm file. To operate on several packages this can accept a comma separated string of packages or a list of packages.Comparison operators for package version are valid here `>`, `<`, `>=`, `<=`. Example - `name >= 1.0`. Spaces around the operator are required.You can also pass an absolute path for a binary which is provided by the package to install. See examples for more information. |
+| **nobest** boolean*added in ansible-core 2.11*               | Set best option to False, so that transactions are not limited to best candidates only.<br>**Choices:**`false` ← (default)<br>`true` |
+| **releasever** string*added in Ansible 2.6*                  | Specifies an alternative release from which all packages will be installed. |
+| **security** boolean*added in Ansible 2.7*                   | If set to `true`, and `state=latest` then only installs updates that have been marked security related.Note that, similar to `dnf upgrade-minimal`, this filter applies to dependencies as well.<br>**Choices:**`false` ← (default)<br>`true` |
+| **skip_broken** boolean*added in Ansible 2.7*                | Skip all unavailable packages or packages with broken dependencies without raising an error. Equivalent to passing the –skip-broken option.<br>**Choices:**`false` ← (default)<br>`true` |
+| **sslverify** boolean*added in ansible-core 2.13*            | Disables SSL validation of the repository server for this transaction.This should be set to `false` if one of the configured repositories is using an untrusted or self-signed certificate.<br>**Choices:**`false`<br>`true` ← (default) |
+| **state** string                                             | Whether to install (`present`, `latest`), or remove (`absent`) a package.Default is `None`, however in effect the default action is `present` unless the `autoremove` option is enabled for this module, then `absent` is inferred.**Choices:**`"absent"``"present"``"installed"``"removed"``"latest"` |
+| **update_cache** aliases: expire-cacheboolean*added in Ansible 2.7* | Force dnf to check if cache is out of date and redownload if needed. Has an effect only if state is *present* or *latest*.<br>**Choices:**`false` ← (default)<br>`true` |
+| **update_only** boolean*added in Ansible 2.7b*               | When using latest, only update installed packages. Do not install packages.Has an effect only if state is *latest*<br>**Choices:**`false` ← (default)<br>`true` |
+| **validate_certs** boolean*added in Ansible 2.7*             | This only applies if using a https url as the source of the rpm. e.g. for localinstall. If set to `false`, the SSL certificates will not be validated.This should only set to `false` used on personally controlled sites using self-signed certificates as it avoids verifying the source site.<br>**Choices:**`false`<br>`true` ← (default) |
 
-Examples
+### Attributes
 
-Return Values
+| Attribute            | Support                                                      | Description                                                  |
+| -------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| **action**           | **partial** In the case of dnf, it has 2 action plugins that use it under the hood, [ansible.builtin.yum](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/yum_module.html#ansible-collections-ansible-builtin-yum-module) and [ansible.builtin.package](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/package_module.html#ansible-collections-ansible-builtin-package-module). | Indicates this has a corresponding action plugin so some parts of the options can be executed on the controller |
+| **async**            | **none**                                                     | Supports being used with the `async` keyword                 |
+| **bypass_host_loop** | **none**                                                     | Forces a ‘global’ task that does not execute per host, this bypasses per host templating and serial, throttle and other loop considerationsConditionals will work as if `run_once` is being used, variables used will be from the first available hostThis action will not work normally outside of lockstep strategies |
+| **check_mode**       | **full**                                                     | Can run in check_mode and return changed status prediction without modifying target |
+| **diff_mode**        | **full**                                                     | Will return details on what has changed (or possibly needs changing in check_mode), when in diff mode |
+| **platform**         | **Platform:** **rhel**                                       | Target OS/families that can be operated against              |
+
+### Examples
+
+```yaml
+- name: Install the latest version of Apache
+  ansible.builtin.dnf:
+    name: httpd
+    state: latest
+
+- name: Install Apache >= 2.4
+  ansible.builtin.dnf:
+    name: httpd >= 2.4
+    state: present
+
+- name: Install the latest version of Apache and MariaDB
+  ansible.builtin.dnf:
+    name:
+      - httpd
+      - mariadb-server
+    state: latest
+
+- name: Remove the Apache package
+  ansible.builtin.dnf:
+    name: httpd
+    state: absent
+
+- name: Install the latest version of Apache from the testing repo
+  ansible.builtin.dnf:
+    name: httpd
+    enablerepo: testing
+    state: present
+
+- name: Upgrade all packages
+  ansible.builtin.dnf:
+    name: "*"
+    state: latest
+
+- name: Update the webserver, depending on which is installed on the system. Do not install the other one
+  ansible.builtin.dnf:
+    name:
+      - httpd
+      - nginx
+    state: latest
+    update_only: yes
+
+- name: Install the nginx rpm from a remote repo
+  ansible.builtin.dnf:
+    name: 'http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm'
+    state: present
+
+- name: Install nginx rpm from a local file
+  ansible.builtin.dnf:
+    name: /usr/local/src/nginx-release-centos-6-0.el6.ngx.noarch.rpm
+    state: present
+
+- name: Install Package based upon the file it provides
+  ansible.builtin.dnf:
+    name: /usr/bin/cowsay
+    state: present
+
+- name: Install the 'Development tools' package group
+  ansible.builtin.dnf:
+    name: '@Development tools'
+    state: present
+
+- name: Autoremove unneeded packages installed as dependencies
+  ansible.builtin.dnf:
+    autoremove: yes
+
+- name: Uninstall httpd but keep its dependencies
+  ansible.builtin.dnf:
+    name: httpd
+    state: absent
+    autoremove: no
+
+- name: Install a modularity appstream with defined stream and profile
+  ansible.builtin.dnf:
+    name: '@postgresql:9.6/client'
+    state: present
+
+- name: Install a modularity appstream with defined stream
+  ansible.builtin.dnf:
+    name: '@postgresql:9.6'
+    state: present
+
+- name: Install a modularity appstream with defined profile
+  ansible.builtin.dnf:
+    name: '@postgresql/client'
+    state: present
+```
 
 ## service 模块
 
 [官网参考文档](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/service_module.html)
 
-Parameters
+### Parameters
 
-Attributes
+| Parameter                                | Comments                                                     |
+| ---------------------------------------- | ------------------------------------------------------------ |
+| **arguments** aliases: argsstring        | Additional arguments provided on the command line.While using remote hosts with systemd this setting will be ignored. |
+| **enabled** boolean                      | Whether the service should start on boot.**At least one of state and enabled are required.**<br>**Choices:**`false`<br>`true` |
+| **name** string / required               | Name of the service.                                         |
+| **pattern** string*added in Ansible 0.7* | If the service does not respond to the status command, name a substring to look for as would be found in the output of the *ps* command as a stand-in for a status result.If the string is found, the service will be assumed to be started.While using remote hosts with systemd this setting will be ignored. |
+| **runlevel** string                      | For OpenRC init scripts (e.g. Gentoo) only.The runlevel that this service belongs to.While using remote hosts with systemd this setting will be ignored.<br>**Default:** `"default"` |
+| **sleep** integer*added in Ansible 1.3*  | If the service is being `restarted` then sleep this many seconds between the stop and start command.This helps to work around badly-behaving init scripts that exit immediately after signaling a process to stop.Not all service managers support sleep, i.e when using systemd this setting will be ignored. |
+| **state** string                         | `started`/`stopped` are idempotent actions that will not run commands unless necessary.`restarted` will always bounce the service.`reloaded` will always reload.**At least one of state and enabled are required.**Note that reloaded will start the service if it is not already started, even if your chosen init system wouldn’t normally.<br>**Choices:**`"reloaded"`<br>`"restarted"`<br>`"started"`<br>`"stopped"` |
+| **use** string*added in Ansible 2.2*     | The service module actually uses system specific modules, normally through auto detection, this setting can force a specific module.Normally it uses the value of the ‘ansible_service_mgr’ fact and falls back to the old ‘service’ module when none matching is found.<br>**Default:** `"auto"` |
 
-Examples
+### Attributes
+
+| Attribute            | Support                                                      | Description                                                  |
+| -------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| **action**           | **full**                                                     | Indicates this has a corresponding action plugin so some parts of the options can be executed on the controller |
+| **async**            | **full**                                                     | Supports being used with the `async` keyword                 |
+| **bypass_host_loop** | **none**                                                     | Forces a ‘global’ task that does not execute per host, this bypasses per host templating and serial, throttle and other loop considerationsConditionals will work as if `run_once` is being used, variables used will be from the first available hostThis action will not work normally outside of lockstep strategies |
+| **check_mode**       | N/Asupport depends on the underlying plugin invoked          | Can run in check_mode and return changed status prediction without modifying target |
+| **diff_mode**        | N/Asupport depends on the underlying plugin invoked          | Will return details on what has changed (or possibly needs changing in check_mode), when in diff mode |
+| **platform**         | **Platforms:** **all**<br>The support depends on the availability for the specific plugin for each platform and if fact gathering is able to detect it | Target OS/families that can be operated against              |
+
+### Examples
+
+```yaml
+- name: Start service httpd, if not started
+  ansible.builtin.service:
+    name: httpd
+    state: started
+
+- name: Stop service httpd, if started
+  ansible.builtin.service:
+    name: httpd
+    state: stopped
+
+- name: Restart service httpd, in all cases
+  ansible.builtin.service:
+    name: httpd
+    state: restarted
+
+- name: Reload service httpd, in all cases
+  ansible.builtin.service:
+    name: httpd
+    state: reloaded
+
+- name: Enable service httpd, and not touch the state
+  ansible.builtin.service:
+    name: httpd
+    enabled: yes
+
+- name: Start service foo, based on running process /usr/bin/foo
+  ansible.builtin.service:
+    name: foo
+    pattern: /usr/bin/foo
+    state: started
+
+- name: Restart network service for interface eth0
+  ansible.builtin.service:
+    name: network
+    state: restarted
+    args: eth0
+```
 
 Return Values
 
@@ -1038,13 +1225,112 @@ Return Values
 
 [官网参考文档](https://docs.ansible.com/ansible/latest/collections/ansible/posix/firewalld_module.html)
 
-Parameters
+### Parameters
 
-Attributes
+| Parameter                                       | Comments                                                     |
+| ----------------------------------------------- | ------------------------------------------------------------ |
+| **icmp_block** string                           | The ICMP block you would like to add/remove to/from a zone in firewalld. |
+| **icmp_block_inversion** string                 | Enable/Disable inversion of ICMP blocks for a zone in firewalld. |
+| **immediate** boolean                           | Should this configuration be applied immediately, if set as permanent.<br>**Choices:**`false` ← (default)<br>`true` |
+| **interface** string                            | The interface you would like to add/remove to/from a zone in firewalld. |
+| **masquerade** string                           | The masquerade setting you would like to enable/disable to/from zones within firewalld. |
+| **offline** boolean                             | Whether to run this module even when firewalld is offline.<br>**Choices:**`false`<br>`true` |
+| **permanent** boolean                           | Should this configuration be in the running firewalld configuration or persist across reboots.As of Ansible 2.3, permanent operations can operate on firewalld configs when it is not running (requires firewalld >= 0.3.9).Note that if this is `false`, immediate is assumed `true`.<br>**Choices:**`false`<br>`true` |
+| **port** string                                 | Name of a port or port range to add/remove to/from firewalld.Must be in the form PORT/PROTOCOL or PORT-PORT/PROTOCOL for port ranges. |
+| **port_forward** list / elements=dictionary     | Port and protocol to forward using firewalld.                |
+| **port** string / required                      | Source port to forward from                                  |
+| **proto** string / required                     | protocol to forward<br>**Choices:**`"udp"`<br>`"tcp"`        |
+| **toaddr** string                               | Optional address to forward to                               |
+| **toport** string / required                    | destination port                                             |
+| **rich_rule** string                            | Rich rule to add/remove to/from firewalld.See [Syntax for firewalld rich language rules](https://firewalld.org/documentation/man-pages/firewalld.richlanguage.html). |
+| **service** string                              | Name of a service to add/remove to/from firewalld.The service must be listed in output of firewall-cmd –get-services. |
+| **source** string                               | The source/network you would like to add/remove to/from firewalld. |
+| **state** string / required                     | Enable or disable a setting.For ports: Should this port accept (enabled) or reject (disabled) connections.The states `present` and `absent` can only be used in zone level operations (i.e. when no other parameters but zone and state are set).<br>**Choices:**`"absent"`<br>`"disabled"`<br>`"enabled"`<br>`"present"` |
+| **target** string*added in ansible.posix 1.2.0* | firewalld Zone targetIf state is set to `absent`, this will reset the target to default<br>**Choices:**`"default"`<br>`"ACCEPT"`<br>`"DROP"`<br>`"%%REJECT%%"` |
+| **timeout** integer                             | The amount of time in seconds the rule should be in effect for when non-permanent.<br>**Default:** `0` |
+| **zone** string                                 | The firewalld zone to add/remove to/from.Note that the default zone can be configured per system but `public` is default from upstream.Available choices can be extended based on per-system configs, listed here are “out of the box” defaults.Possible values include `block`, `dmz`, `drop`, `external`, `home`, `internal`, `public`, `trusted`, `work`. |
 
-Examples
+### Examples
 
-Return Values
+```yaml
+- name: permit traffic in default zone for https service
+  ansible.posix.firewalld:
+    service: https
+    permanent: true
+    state: enabled
+
+- name: do not permit traffic in default zone on port 8081/tcp
+  ansible.posix.firewalld:
+    port: 8081/tcp
+    permanent: true
+    state: disabled
+
+- ansible.posix.firewalld:
+    port: 161-162/udp
+    permanent: true
+    state: enabled
+
+- ansible.posix.firewalld:
+    zone: dmz
+    service: http
+    permanent: true
+    state: enabled
+
+- ansible.posix.firewalld:
+    rich_rule: rule service name="ftp" audit limit value="1/m" accept
+    permanent: true
+    state: enabled
+
+- ansible.posix.firewalld:
+    source: 192.0.2.0/24
+    zone: internal
+    state: enabled
+
+- ansible.posix.firewalld:
+    zone: trusted
+    interface: eth2
+    permanent: true
+    state: enabled
+
+- ansible.posix.firewalld:
+    masquerade: true
+    state: enabled
+    permanent: true
+    zone: dmz
+
+- ansible.posix.firewalld:
+    zone: custom
+    state: present
+    permanent: true
+
+- ansible.posix.firewalld:
+    zone: drop
+    state: enabled
+    permanent: true
+    icmp_block_inversion: true
+
+- ansible.posix.firewalld:
+    zone: drop
+    state: enabled
+    permanent: true
+    icmp_block: echo-request
+
+- ansible.posix.firewalld:
+    zone: internal
+    state: present
+    permanent: true
+    target: ACCEPT
+
+- name: Redirect port 443 to 8443 with Rich Rule
+  ansible.posix.firewalld:
+    rich_rule: rule family=ipv4 forward-port port=443 protocol=tcp to-port=8443
+    zone: public
+    permanent: true
+    immediate: true
+    state: enabled
+```
+
+
 
 ## user 模块
 
