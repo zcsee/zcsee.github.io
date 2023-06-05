@@ -1643,34 +1643,242 @@ Return Values
 
 [官网参考文档](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/replace_module.html)
 
-Parameters
+### Parameters
 
-Attributes
+| Parameter                                             | Comments                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **after** string                                      | If specified, only content after this match will be replaced/removed.Can be used in combination with `before`.Uses Python regular expressions; see https://docs.python.org/3/library/re.html.Uses DOTALL, which means the `.` special character _can match newlines_.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| **attributes** aliases: attrstring                    | The attributes the resulting filesystem object should have.To get supported flags look at the man page for _chattr_ on the target system.This string should contain the attributes in the same order as the one displayed by _lsattr_.The `=` operator is assumed as default, otherwise `+` or `-` operators need to be included in the string.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| **backup** boolean                                    | Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered it incorrectly.<br>**Choices:**`false` ← (default)<br>`true`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| **before** string                                     | If specified, only content before this match will be replaced/removed.Can be used in combination with `after`.Uses Python regular expressions; see https://docs.python.org/3/library/re.html.Uses DOTALL, which means the `.` special character _can match newlines_.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| **encoding** string                                   | The character encoding for reading and writing the file.<br>**Default:** `"utf-8"`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| **group** string                                      | Name of the group that should own the filesystem object, as would be fed to _chown_.When left unspecified, it uses the current group of the current user unless you are root, in which case it can preserve the previous ownership.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| **mode** any                                          | The permissions the resulting filesystem object should have.For those used to _/usr/bin/chmod_ remember that modes are actually octal numbers. You must give Ansible enough information to parse them correctly. For consistent results, quote octal numbers (for example, `'644'` or `'1777'`) so Ansible receives a string and can do its own conversion from string into number. Adding a leading zero (for example, `0755`) works sometimes, but can fail in loops and some other circumstances.Giving Ansible a number without following either of these rules will end up with a decimal number which will have unexpected results.As of Ansible 1.8, the mode may be specified as a symbolic mode (for example, `u+rwx` or `u=rw,g=r,o=r`).If `mode` is not specified and the destination filesystem object **does not** exist, the default `umask` on the system will be used when setting the mode for the newly created filesystem object.If `mode` is not specified and the destination filesystem object **does** exist, the mode of the existing filesystem object will be used.Specifying `mode` is the best way to ensure filesystem objects are created with the correct permissions. See CVE-2020-1736 for further details. |
+| **others** string                                     | All arguments accepted by the [ansible.builtin.file](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html#ansible-collections-ansible-builtin-file-module) module also work here.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| **owner** string                                      | Name of the user that should own the filesystem object, as would be fed to _chown_.When left unspecified, it uses the current user unless you are root, in which case it can preserve the previous ownership.Specifying a numeric username will be assumed to be a user ID and not a username. Avoid numeric usernames to avoid this confusion.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| **path** aliases: dest, destfile, namepath / required | The file to modify.Before Ansible 2.3 this option was only usable as _dest_, _destfile_ and _name_.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| **regexp** string / required                          | The regular expression to look for in the contents of the file.Uses Python regular expressions; see https://docs.python.org/3/library/re.html.Uses MULTILINE mode, which means `^` and `$` match the beginning and end of the file, as well as the beginning and end respectively of _each line_ of the file.Does not use DOTALL, which means the `.` special character matches any character _except newlines_. A common mistake is to assume that a negated character set like `[^#]` will also not match newlines.In order to exclude newlines, they must be added to the set like `[^#\n]`.Note that, as of Ansible 2.0, short form tasks should have any escape sequences backslash-escaped in order to prevent them being parsed as string literal escapes. See the examples.                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| **replace** string                                    | The string to replace regexp matches.May contain backreferences that will get expanded with the regexp capture groups if the regexp matches.If not set, matches are removed entirely.Backreferences can be used ambiguously like `\1`, or explicitly like `\g<1>`.<br>**Default:** `""`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| **selevel** string                                    | The level part of the SELinux filesystem object context.This is the MLS/MCS attribute, sometimes known as the `range`.When set to `_default`, it will use the `level` portion of the policy if available.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| **serole** string                                     | The role part of the SELinux filesystem object context.When set to `_default`, it will use the `role` portion of the policy if available.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| **setype** string                                     | The type part of the SELinux filesystem object context.When set to `_default`, it will use the `type` portion of the policy if available.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| **seuser** string                                     | The user part of the SELinux filesystem object context.By default it uses the `system` policy, where applicable.When set to `_default`, it will use the `user` portion of the policy if available.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| **unsafe_writes** boolean                             | Influence when to use atomic operation to prevent data corruption or inconsistent reads from the target filesystem object.By default this module uses atomic operations to prevent data corruption or inconsistent reads from the target filesystem objects, but sometimes systems are configured or just broken in ways that prevent this. One example is docker mounted filesystem objects, which cannot be updated atomically from inside the container and can only be written in an unsafe manner.This option allows Ansible to fall back to unsafe methods of updating filesystem objects when atomic operations fail (however, it doesn’t force Ansible to perform unsafe writes).IMPORTANT! Unsafe writes are subject to race conditions and can lead to data corruption.<br>**Choices:**`false` ← (default)<br>`true`                                                                                                                                                                                                                                                                                                                                                                                                               |
+| **validate** string                                   | The validation command to run before copying the updated file into the final destination.A temporary file path is used to validate, passed in through ‘%s’ which must be present as in the examples below.Also, the command is passed securely so shell features such as expansion and pipes will not work.For an example on how to handle more complex validation than what this option provides, see [handling complex validation](https://docs.ansible.com/ansible/latest/reference_appendices/faq.html#complex-configuration-validation).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 
-Examples
+### Attributes
 
-Return Values
+| Attribute                | Support                 | Description                                                                                           |
+| ------------------------ | ----------------------- | ----------------------------------------------------------------------------------------------------- |
+| **check_mode**           | **full**                | Can run in check_mode and return changed status prediction without modifying target                   |
+| **diff_mode**            | **full**                | Will return details on what has changed (or possibly needs changing in check_mode), when in diff mode |
+| **platform**             | **Platform:** **posix** | Target OS/families that can be operated against                                                       |
+| **safe_file_operations** | **full**                | Uses Ansible’s strict file operation functions to ensure proper permissions and avoid data corruption |
+| **vault**                | **none**                | Can automatically decrypt Ansible vaulted files                                                       |
+
+### Examples
+
+```yaml
+- name: Replace old hostname with new hostname (requires Ansible >= 2.4)
+  ansible.builtin.replace:
+    path: /etc/hosts
+    regexp: '(\s+)old\.host\.name(\s+.*)?$'
+    replace: '\1new.host.name\2'
+
+- name: Replace after the expression till the end of the file (requires Ansible >= 2.4)
+  ansible.builtin.replace:
+    path: /etc/apache2/sites-available/default.conf
+    after: "NameVirtualHost [*]"
+    regexp: "^(.+)$"
+    replace: '# \1'
+
+- name: Replace before the expression till the begin of the file (requires Ansible >= 2.4)
+  ansible.builtin.replace:
+    path: /etc/apache2/sites-available/default.conf
+    before: "# live site config"
+    regexp: "^(.+)$"
+    replace: '# \1'
+
+# Prior to Ansible 2.7.10, using before and after in combination did the opposite of what was intended.
+# see https://github.com/ansible/ansible/issues/31354 for details.
+- name: Replace between the expressions (requires Ansible >= 2.4)
+  ansible.builtin.replace:
+    path: /etc/hosts
+    after: "<VirtualHost [*]>"
+    before: "</VirtualHost>"
+    regexp: "^(.+)$"
+    replace: '# \1'
+
+- name: Supports common file attributes
+  ansible.builtin.replace:
+    path: /home/jdoe/.ssh/known_hosts
+    regexp: '^old\.host\.name[^\n]*\n'
+    owner: jdoe
+    group: jdoe
+    mode: "0644"
+
+- name: Supports a validate command
+  ansible.builtin.replace:
+    path: /etc/apache/ports
+    regexp: '^(NameVirtualHost|Listen)\s+80\s*$'
+    replace: '\1 127.0.0.1:8080'
+    validate: "/usr/sbin/apache2ctl -f %s -t"
+
+- name: Short form task (in ansible 2+) necessitates backslash-escaped sequences
+  ansible.builtin.replace: path=/etc/hosts regexp='\\b(localhost)(\\d*)\\b' replace='\\1\\2.localdomain\\2 \\1\\2'
+
+- name: Long form task does not
+  ansible.builtin.replace:
+    path: /etc/hosts
+    regexp: '\b(localhost)(\d*)\b'
+    replace: '\1\2.localdomain\2 \1\2'
+
+- name: Explicitly specifying positional matched groups in replacement
+  ansible.builtin.replace:
+    path: /etc/ssh/sshd_config
+    regexp: '^(ListenAddress[ ]+)[^\n]+$'
+    replace: '\g<1>0.0.0.0'
+
+- name: Explicitly specifying named matched groups
+  ansible.builtin.replace:
+    path: /etc/ssh/sshd_config
+    regexp: '^(?P<dctv>ListenAddress[ ]+)(?P<host>[^\n]+)$'
+    replace: '#\g<dctv>\g<host>\n\g<dctv>0.0.0.0'
+```
 
 ## setup 模块
 
 [官网参考文档](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/setup_module.html)
 
-Parameters
+### Parameters
 
-Attributes
+| Parameter                                | Comments                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **fact_path** path                       | Path used for local ansible facts (`*.fact`) - files in this dir will be run (if executable) and their results be added to `ansible_local` facts. If a file is not executable it is read instead. File/results format can be JSON or INI-format. The default `fact_path` can be specified in `ansible.cfg` for when setup is automatically called as part of `gather_facts`. NOTE - For windows clients, the results will be added to a variable named after the local file (without extension suffix), rather than `ansible_local`.Since Ansible 2.1, Windows hosts can use `fact_path`. Make sure that this path exists on the target host. Files in this path MUST be PowerShell scripts `.ps1` which outputs an object. This object will be formatted by Ansible as json so the script should be outputting a raw hashtable, array, or other primitive object.<br>**Default:** `"/etc/ansible/facts.d"`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| **filter** list / elements=string        | If supplied, only return facts that match one of the shell-style (fnmatch) pattern. An empty list basically means ‘no filter’. As of Ansible 2.11, the type has changed from string to list and the default has became an empty list. A simple string is still accepted and works as a single pattern. The behaviour prior to Ansible 2.11 remains.<br>**Default:** `[]`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| **gather_subset** list / elements=string | If supplied, restrict the additional facts collected to the given subset. Possible values: `all`, `all_ipv4_addresses`, `all_ipv6_addresses`, `apparmor`, `architecture`, `caps`, `chroot`,`cmdline`, `date_time`, `default_ipv4`, `default_ipv6`, `devices`, `distribution`, `distribution_major_version`, `distribution_release`, `distribution_version`, `dns`, `effective_group_ids`, `effective_user_id`, `env`, `facter`, `fips`, `hardware`, `interfaces`, `is_chroot`, `iscsi`, `kernel`, `local`, `lsb`, `machine`, `machine_id`, `mounts`, `network`, `ohai`, `os_family`, `pkg_mgr`, `platform`, `processor`, `processor_cores`, `processor_count`, `python`, `python_version`, `real_user_id`, `selinux`, `service_mgr`, `ssh_host_key_dsa_public`, `ssh_host_key_ecdsa_public`, `ssh_host_key_ed25519_public`, `ssh_host_key_rsa_public`, `ssh_host_pub_keys`, `ssh_pub_keys`, `system`, `system_capabilities`, `system_capabilities_enforced`, `user`, `user_dir`, `user_gecos`, `user_gid`, `user_id`, `user_shell`, `user_uid`, `virtual`, `virtualization_role`, `virtualization_type`. Can specify a list of values to specify a larger subset. Values can also be used with an initial `!` to specify that that specific subset should not be collected. For instance: `!hardware,!network,!virtual,!ohai,!facter`. If `!all` is specified then only the min subset is collected. To avoid collecting even the min subset, specify `!all,!min`. To collect only specific facts, use `!all,!min`, and specify the particular fact subsets. Use the filter parameter if you do not want to display some collected facts.<br>**Default:** `["all"]` |
+| **gather_timeout** integer               | Set the default timeout in seconds for individual fact gathering.<br>**Default:** `10`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 
-Examples
+### Attributes
 
-Return Values
+| Attribute      | Support                               | Description                                                                                           |
+| -------------- | ------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| **check_mode** | **full**                              | Can run in check_mode and return changed status prediction without modifying target                   |
+| **diff_mode**  | **none**                              | Will return details on what has changed (or possibly needs changing in check_mode), when in diff mode |
+| **facts**      | **full**                              | Action returns an `ansible_facts` dictionary that will update existing host facts                     |
+| **platform**   | **Platforms:** **posix**, **windows** | Target OS/families that can be operated against                                                       |
+
+### Examples
+
+```yaml
+# Display facts from all hosts and store them indexed by I(hostname) at C(/tmp/facts).
+# ansible all -m ansible.builtin.setup --tree /tmp/facts
+
+# Display only facts regarding memory found by ansible on all hosts and output them.
+# ansible all -m ansible.builtin.setup -a 'filter=ansible_*_mb'
+
+# Display only facts returned by facter.
+# ansible all -m ansible.builtin.setup -a 'filter=facter_*'
+
+# Collect only facts returned by facter.
+# ansible all -m ansible.builtin.setup -a 'gather_subset=!all,facter'
+
+- name: Collect only facts returned by facter
+  ansible.builtin.setup:
+    gather_subset:
+      - "!all"
+      - "!<any valid subset>"
+      - facter
+
+- name: Filter and return only selected facts
+  ansible.builtin.setup:
+    filter:
+      - "ansible_distribution"
+      - "ansible_machine_id"
+      - "ansible_*_mb"
+
+# Display only facts about certain interfaces.
+# ansible all -m ansible.builtin.setup -a 'filter=ansible_eth[0-2]'
+
+# Restrict additional gathered facts to network and virtual (includes default minimum facts)
+# ansible all -m ansible.builtin.setup -a 'gather_subset=network,virtual'
+
+# Collect only network and virtual (excludes default minimum facts)
+# ansible all -m ansible.builtin.setup -a 'gather_subset=!all,network,virtual'
+
+# Do not call puppet facter or ohai even if present.
+# ansible all -m ansible.builtin.setup -a 'gather_subset=!facter,!ohai'
+
+# Only collect the default minimum amount of facts:
+# ansible all -m ansible.builtin.setup -a 'gather_subset=!all'
+
+# Collect no facts, even the default minimum subset of facts:
+# ansible all -m ansible.builtin.setup -a 'gather_subset=!all,!min'
+
+# Display facts from Windows hosts with custom facts stored in C:\custom_facts.
+# ansible windows -m ansible.builtin.setup -a "fact_path='c:\custom_facts'"
+
+# Gathers facts for the machines in the dbservers group (a.k.a Delegating facts)
+- hosts: app_servers
+  tasks:
+    - name: Gather facts from db servers
+      ansible.builtin.setup:
+      delegate_to: "{{ item }}"
+      delegate_facts: true
+      loop: "{{ groups['dbservers'] }}"
+```
 
 ## debug 模块
 
 [官网参考文档](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/debug_module.html)
 
-Parameters
+### Parameters
 
-Attributes
+| Parameter             | Comments                                                                                                                                                                                                                                                       |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **msg** string        | The customized message that is printed. If omitted, prints a generic message.<br>**Default:** `"Hello world!"`                                                                                                                                                 |
+| **var** string        | A variable name to debug.Mutually exclusive with the `msg` option.Be aware that this option already runs in Jinja2 context and has an implicit `{{ }}` wrapping, so you should not be using Jinja2 delimiters unless you are looking for double interpolation. |
+| **verbosity** integer | A number that controls when the debug is run, if you set to 3 it will only run debug when -vvv or above.<br>**Default:** `0`                                                                                                                                   |
 
-Examples
+### Attributes
 
-Return Values
+| Attribute            | Support                                                                                             | Description                                                                                                                                                                                                                                                                                                             |
+| -------------------- | --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **action**           | **full**                                                                                            | Indicates this has a corresponding action plugin so some parts of the options can be executed on the controller                                                                                                                                                                                                         |
+| **async**            | **none**                                                                                            | Supports being used with the `async` keyword                                                                                                                                                                                                                                                                            |
+| **become**           | **none**                                                                                            | Is usable alongside become keywords                                                                                                                                                                                                                                                                                     |
+| **bypass_host_loop** | **none**                                                                                            | Forces a ‘global’ task that does not execute per host, this bypasses per host templating and serial, throttle and other loop considerationsConditionals will work as if `run_once` is being used, variables used will be from the first available hostThis action will not work normally outside of lockstep strategies |
+| **check_mode**       | **full**                                                                                            | Can run in check_mode and return changed status prediction without modifying target                                                                                                                                                                                                                                     |
+| **connection**       | **none**                                                                                            | Uses the target’s configured connection information to execute code on it                                                                                                                                                                                                                                               |
+| **delegation**       | **partial**Aside from `register` and/or in combination with `delegate_facts`, it has little effect. | Can be used in conjunction with delegate_to and related keywords                                                                                                                                                                                                                                                        |
+| **diff_mode**        | **none**                                                                                            | Will return details on what has changed (or possibly needs changing in check_mode), when in diff mode                                                                                                                                                                                                                   |
+| **platform**         | **Platforms:** **all**                                                                              | Target OS/families that can be operated against                                                                                                                                                                                                                                                                         |
+
+### Examples
+
+```yaml
+- name: Print the gateway for each host when defined
+  ansible.builtin.debug:
+    msg: System {{ inventory_hostname }} has gateway {{ ansible_default_ipv4.gateway }}
+  when: ansible_default_ipv4.gateway is defined
+
+- name: Get uptime information
+  ansible.builtin.shell: /usr/bin/uptime
+  register: result
+
+- name: Print return information from the previous task
+  ansible.builtin.debug:
+    var: result
+    verbosity: 2
+
+- name: Display all variables/facts known for a host
+  ansible.builtin.debug:
+    var: hostvars[inventory_hostname]
+    verbosity: 4
+
+- name: Prints two lines of messages, but only if there is an environment value set
+  ansible.builtin.debug:
+    msg:
+      - "Provisioning based on YOUR_KEY which is: {{ lookup('ansible.builtin.env', 'YOUR_KEY') }}"
+      - "These servers were built using the password of '{{ password_used }}'. Please retain this for later use."
+```
