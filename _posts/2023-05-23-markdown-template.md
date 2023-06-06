@@ -168,6 +168,8 @@ These elements extend the basic syntax by adding additional features. Not all Ma
 
 Here's a sentence with a footnote. [^1]
 
+Here's a sentence with a footnote2. [^2]
+
 [^1]: This is the footnote.
 [^2]: This is the footnote.
 
