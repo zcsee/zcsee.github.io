@@ -6,7 +6,7 @@ date: 2023-01-12
 categories: copy
 author: Jason
 cover: 'assets/img/profile.png'
-tags: jj kk ll
+tags: first_posts
 ---
 
 > 测试下 >
